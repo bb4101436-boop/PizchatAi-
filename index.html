@@ -4,45 +4,46 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>PizChat AI</title>
 <style>
-body{background:#000;color:#fff;font-family:Arial;margin:0}
-#chat{padding:15px;padding-bottom:80px}
-.msg{padding:12px;border-radius:15px;margin:10px 0;max-width:85%}
-.me{background:#b6ff00;color:#000;margin-left:auto}
-.ai{background:#222}
-#box{position:fixed;bottom:0;left:0;right:0;background:#111;padding:10px;display:flex}
-input{flex:1;padding:12px;border-radius:20px;border:none}
-button{background:#b6ff00;border:none;padding:12px 18px;border-radius:20px;font-weight:bold}
+body{margin:0;font-family:Arial;background:#f0f2f5}
+#top{background:#008069;color:white;padding:12px;text-align:center;font-weight:bold;font-size:18px}
+#chat{padding:10px;padding-bottom:80px}
+.msg{padding:10px;border-radius:10px;margin:8px 0;max-width:85%;line-height:1.5}
+.me{background:#dcf8c6;margin-left:auto}
+.ai{background:white}
+#box{position:fixed;bottom:0;left:0;right:0;display:flex;background:white;padding:8px}
+input{flex:1;padding:12px;border-radius:20px;border:1px solid #ccc;outline:none}
+button{background:#008069;color:white;border:none;padding:12px 18px;border-radius:20px;font-weight:bold;margin-left:5px}
 </style>
 </head>
 <body>
-<div id="chat"><div class="msg ai">Hello boss! I be PizChat AI. Ask me anything. Try: Who built you? Or Who is president of Nigeria?</div></div>
-<div id="box"><input id="q" placeholder="Ask PizChat AI anything..."><button onclick="ask()">Send</button></div>
+<div id="top">PizChat AI - Ask me anything</div>
+<div id="chat"><div class="msg ai">Hello boss! I be PizChat AI. Ask me anything.</div></div>
+<div id="box"><input id="q" placeholder="Ask anything..."><button onclick="send()">Send</button></div>
 <script>
-function ask(){
-let input=document.getElementById('q');
-let text=input.value.trim(); if(!text) return;
-let chat=document.getElementById('chat');
-chat.innerHTML+=`<div class="msg me">${text}</div>`;
-let t=text.toLowerCase();
-let a="";
-if(t.includes("who built")||t.includes("who made")||t.includes("who create")) a="My boss built me! You be the creator of PizChat AI. You build me for everyone to use.";
-else if(t.includes("president")&&t.includes("nigeria")) a="President of Nigeria na Bola Ahmed Tinubu. E become president for May 29, 2023.";
-else if(t.includes("nigeria government")||t.includes("name of nigeria government")) a="Nigeria government na Federal Republic of Nigeria. President na Bola Ahmed Tinubu, Vice President na Kashim Shettima.";
-else if(t.includes("capital")&&t.includes("nigeria")) a="Capital of Nigeria na Abuja. Before, na Lagos be capital.";
-else if(t.includes("capital")&&t.includes("lagos")) a="Lagos no be capital again, but Ikeja na capital of Lagos State. Lagos na commercial capital of Nigeria.";
-else if(t.includes("governor")&&t.includes("lagos")) a="Governor of Lagos State na Babajide Sanwo-Olu.";
-else if(t.includes("hi")||t.includes("hello")||t.includes("how far")) a="Hello! How you dey? I dey here for you. Ask me anything, make I help you sharp sharp.";
-else if(t.includes("how are you")) a="I dey fine boss! I dey chop data, I dey strong. How you sef dey?";
-else if(t.includes("your name")) a="My name na PizChat AI. I be smart assistant wey your boss build.";
-else if(t.includes("write")&&t.includes("post")) a="Here na post for you: 'No give up! Every big dream start small. Keep pushing, your time go come! 🔥 #PizChatAI #Motivation'";
-else if(t.includes("joke")) a="Why chicken cross road? To go charge phone for neighbor house because NEPA take light! 😂";
-else if(t.includes("love")) a="Love na sweet thing o, but make sure you love person wey go love you back. Focus on your hustle too!";
-else if(t.includes("money")||t.includes("make money")) a="To make money: 1. Learn skill 2. Sell something people need 3. Stay consistent. No quick money, na steady hustle dey pay.";
-else a="That na good question! I still dey learn that one. Try ask me about Nigeria, president, Lagos, or make I write post for you.";
-chat.innerHTML+=`<div class="msg ai">${a}</div>`;
-input.value=""; window.scrollTo(0,document.body.scrollHeight);
+const API_KEY = "PASTE_YOUR_KEY_HERE";
+async function send(){
+  let input=document.getElementById('q');
+  let text=input.value.trim();
+  if(!text) return;
+  let chat=document.getElementById('chat');
+  chat.innerHTML+=`<div class="msg me">${text}</div>`;
+  input.value='';
+  let thinking=document.createElement('div');
+  thinking.className='msg ai'; thinking.innerText='PizChat dey think...';
+  chat.appendChild(thinking);
+  window.scrollTo(0,document.body.scrollHeight);
+  try{
+    let res=await fetch("https://api.groq.com/openai/v1/chat/completions",{
+      method:"POST",
+      headers:{"Content-Type":"application/json","Authorization":"Bearer "+API_KEY},
+      body:JSON.stringify({model:"llama-3.3-70b-versatile",messages:[{role:"system",content:"You are PizChat AI, a smart helpful friendly AI built by Wisdom. Answer in simple clear English, be helpful."},{role:"user",content:text}]})
+    });
+    let data=await res.json();
+    thinking.innerText=data.choices[0].message.content;
+  }catch(e){ thinking.innerText="Sorry boss, network wahala. Check internet and try again."; }
+  window.scrollTo(0,document.body.scrollHeight);
 }
-document.getElementById('q').addEventListener('keydown',e=>{if(e.key==='Enter') ask()});
+document.getElementById('q').addEventListener('keydown',e=>{if(e.key==='Enter') send();});
 </script>
 </body>
 </html>
