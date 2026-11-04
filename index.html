@@ -1,49 +1,63 @@
 <!DOCTYPE html>
 <html>
 <head>
-<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>PizChat AI</title>
 <style>
-body{margin:0;font-family:Arial;background:#f0f2f5}
-#top{background:#008069;color:white;padding:12px;text-align:center;font-weight:bold;font-size:18px}
-#chat{padding:10px;padding-bottom:80px}
-.msg{padding:10px;border-radius:10px;margin:8px 0;max-width:85%;line-height:1.5}
-.me{background:#dcf8c6;margin-left:auto}
-.ai{background:white}
-#box{position:fixed;bottom:0;left:0;right:0;display:flex;background:white;padding:8px}
-input{flex:1;padding:12px;border-radius:20px;border:1px solid #ccc;outline:none}
-button{background:#008069;color:white;border:none;padding:12px 18px;border-radius:20px;font-weight:bold;margin-left:5px}
+body{margin:0;font-family:Arial;background:#f2f2f2}
+#top{background:#009900;color:white;padding:15px;text-align:center;font-weight:bold;font-size:18px}
+#chat{padding:15px;padding-bottom:120px;max-width:800px;margin:auto}
+.me{background:white;padding:10px;border-radius:10px;margin:10px 0;margin-left:40px;line-height:1.5}
+.ai{background:#e6ffe6;padding:10px;border-radius:10px;margin:10px 0;margin-right:40px;line-height:1.5}
+#box{position:fixed;bottom:0;left:0;right:0;display:flex;background:white;padding:10px;gap:8px}
+#q{flex:1;padding:12px;border-radius:20px;border:1px solid #ccc;outline:none;font-size:16px}
+#sendBtn{background:#009900;color:white;border:none;padding:12px 20px;border-radius:20px;font-weight:bold;font-size:16px}
 </style>
 </head>
 <body>
-<div id="top">PizChat AI - Ask me anything</div>
-<div id="chat"><div class="msg ai">Hello boss! I be PizChat AI. Ask me anything.</div></div>
-<div id="box"><input id="q" placeholder="Ask anything..."><button onclick="send()">Send</button></div>
+<div id="top">PizChat AI - Ask Me Anything</div>
+<div id="chat">
+<div class="ai">Hello boss! I be PizChat AI. Ask me anything, I go answer you sharp sharp.</div>
+</div>
+<div id="box">
+<input id="q" placeholder="Ask anything..." autocomplete="off">
+<button id="sendBtn">Send</button>
+</div>
 <script>
 const API_KEY = "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
+
 async function send(){
-  let input=document.getElementById('q');
-  let text=input.value.trim();
+  let input = document.getElementById('q');
+  let text = input.value.trim();
   if(!text) return;
-  let chat=document.getElementById('chat');
-  chat.innerHTML+=`<div class="msg me">${text}</div>`;
-  input.value='';
-  let thinking=document.createElement('div');
-  thinking.className='msg ai'; thinking.innerText='PizChat dey think...';
+  let chat = document.getElementById('chat');
+  chat.innerHTML += '<div class="me">'+text+'</div>';
+  input.value = '';
+  let thinking = document.createElement('div');
+  thinking.className = 'ai';
+  thinking.textContent = 'PizChat dey think...';
   chat.appendChild(thinking);
-  window.scrollTo(0,document.body.scrollHeight);
+  window.scrollTo(0, document.body.scrollHeight);
   try{
-    let res=await fetch("https://api.groq.com/openai/v1/chat/completions",{
-      method:"POST",
-      headers:{"Content-Type":"application/json","Authorization":"Bearer "+API_KEY},
-      body:JSON.stringify({model:"llama-3.3-70b-versatile",messages:[{role:"system",content:"You are PizChat AI, a smart helpful friendly AI built by Wisdom. Answer in simple clear English, be helpful."},{role:"user",content:text}]})
+    let res = await fetch("https://api.groq.com/openai/v1/chat/completions", {
+      method: "POST",
+      headers: {"Content-Type": "application/json", "Authorization": "Bearer " + API_KEY},
+      body: JSON.stringify({model: "llama-3.3-70b-versatile", messages: [{role: "system", content: "You are PizChat AI, a friendly helpful assistant. Answer in simple clear English, sometimes with Nigerian Pidgin flavour."}, {role: "user", content: text}]})
     });
-    let data=await res.json();
-    thinking.innerText=data.choices[0].message.content;
-  }catch(e){ thinking.innerText="Sorry boss, network wahala. Check internet and try again."; }
-  window.scrollTo(0,document.body.scrollHeight);
+    let data = await res.json();
+    if(data.choices && data.choices[0]){
+      thinking.textContent = data.choices[0].message.content;
+    } else {
+      thinking.textContent = "Sorry boss, Groq return error: " + JSON.stringify(data).slice(0,200);
+    }
+  } catch(e){
+    thinking.textContent = "Sorry boss, network wahala. Check internet and try again. Error: " + e.message;
+  }
+  window.scrollTo(0, document.body.scrollHeight);
 }
-document.getElementById('q').addEventListener('keydown',e=>{if(e.key==='Enter') send();});
+
+document.getElementById('sendBtn').addEventListener('click', send);
+document.getElementById('q').addEventListener('keydown', function(e){ if(e.key === 'Enter'){ send(); } });
 </script>
 </body>
 </html>
