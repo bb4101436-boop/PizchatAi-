@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PizChat AI</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box;font-family:Arial,sans-serif}
+body{background:#000;color:#fff;height:100vh;display:flex;flex-direction:column}
+#loader{position:fixed;inset:0;background:#000;display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:99}
+#loader .p{width:90px;height:90px;background:#C6FF00;color:#000;font-size:65px;font-weight:900;display:flex;align-items:center;justify-content:center;border-radius:22px}
+#loader .bar{width:110px;height:6px;background:#222;border-radius:10px;margin-top:35px;overflow:hidden}
+#loader .fill{height:100%;width:0%;background:#C6FF00}
+header{background:#111;padding:14px;display:flex;align-items:center;gap:10px;border-bottom:1px solid #222}
+.logo{width:36px;height:36px;background:#C6FF00;color:#000;font-weight:900;display:flex;align-items:center;justify-content:center;border-radius:10px;font-size:22px}
+#chat{flex:1;padding:15px;overflow-y:auto;display:flex;flex-direction:column;gap:10px}
+.msg{max-width:80%;padding:11px 14px;border-radius:16px;font-size:15px;line-height:1.4}
+.me{background:#C6FF00;color:#000;align-self:flex-end;border-bottom-right-radius:4px}
+.ai{background:#1a1a1a;align-self:flex-start;border-bottom-left-radius:4px;border:1px solid #222}
+.inputBox{display:flex;gap:8px;padding:12px;background:#111;border-top:1px solid #222}
+input{flex:1;padding:13px;border-radius:25px;border:none;background:#222;color:#fff;outline:none}
+button{padding:13px 20px;border-radius:25px;border:none;background:#C6FF00;font-weight:800}
+</style>
+</head>
+<body>
+<div id="loader">
+<div class="p">P</div>
+<div class="bar"><div class="fill" id="fill"></div></div>
+</div>
+<header>
+<div class="logo">P</div>
+<div><b>PizChat AI</b><br><small style="color:#C6FF00">Online - Smart and Fast</small></div>
+</header>
+<div id="chat">
+<div class="msg ai">Hello boss! I be PizChat AI. Ask me anything. Try: Who built you? or Write a post for me</div>
+</div>
+<div class="inputBox">
+<input id="inp" placeholder="Ask PizChat AI anything...">
+<button onclick="send()">Send</button>
+</div>
+<script>
+let f=0;
+let bar=setInterval(function(){
+f+=20;
+document.getElementById('fill').style.width=f+'%';
+if(f>=100){clearInterval(bar); setTimeout(function(){document.getElementById('loader').style.display='none'},300)}
+},300);
+function send(){
+let inp=document.getElementById('inp');
+let txt=inp.value.trim();
+if(!txt) return;
+let chat=document.getElementById('chat');
+chat.innerHTML+='<div class="msg me">'+txt+'</div>';
+inp.value='';
+setTimeout(function(){
+let low=txt.toLowerCase();
+let ans="That na good question! For PizChat AI, we go make am smart, fast and for everyone. Ask me another thing.";
+if(low.indexOf('who built')>-1 || low.indexOf('who created')>-1){ans="Wisdom Ikeagwuchi Nwaozuru built me! PizChat AI na him own - smart, fast social AI app from Nigeria to the world.";}
+else if(low.indexOf('hello')>-1 || low.indexOf('hi')>-1){ans="Hello! How you dey? I dey here for you. Ask me anything, make I help you sharp sharp.";}
+else if(low.indexOf('post')>-1){ans="Here na your post: No dey wait for perfect time. Start now, grow fast, with PizChat AI. Copy am post am, e go blow!";}
+else if(low.indexOf('money')>-1 || low.indexOf('business')>-1){ans="For money: 1. Find problem 2. Solve am with PizChat 3. Stay consistent. Small small e go blow. No give up.";}
+chat.innerHTML+='<div class="msg ai">'+ans+'</div>';
+chat.scrollTop=chat.scrollHeight;
+},600);
+chat.scrollTop=chat.scrollHeight;
+}
+document.getElementById('inp').addEventListener('keypress',function(e){if(e.key==='Enter') send()});
+</script>
+</body>
+</html>
