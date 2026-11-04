@@ -5,59 +5,32 @@
 <title>PizChat AI</title>
 <style>
 body{margin:0;font-family:Arial;background:#f2f2f2}
-#top{background:#009900;color:white;padding:15px;text-align:center;font-weight:bold;font-size:18px}
-#chat{padding:15px;padding-bottom:120px;max-width:800px;margin:auto}
-.me{background:white;padding:10px;border-radius:10px;margin:10px 0;margin-left:40px;line-height:1.5}
-.ai{background:#e6ffe6;padding:10px;border-radius:10px;margin:10px 0;margin-right:40px;line-height:1.5}
+#top{background:#009900;color:white;padding:15px;text-align:center;font-weight:bold}
+#chat{padding:15px;padding-bottom:120px}
+.me{background:white;padding:10px;border-radius:10px;margin:10px 0;margin-left:40px}
+.ai{background:#e6ffe6;padding:10px;border-radius:10px;margin:10px 0;margin-right:40px}
 #box{position:fixed;bottom:0;left:0;right:0;display:flex;background:white;padding:10px;gap:8px}
-#q{flex:1;padding:12px;border-radius:20px;border:1px solid #ccc;outline:none;font-size:16px}
-#sendBtn{background:#009900;color:white;border:none;padding:12px 20px;border-radius:20px;font-weight:bold;font-size:16px}
+#q{flex:1;padding:12px;border-radius:20px;border:1px solid #ccc;font-size:16px}
+#sendBtn{background:#009900;color:white;border:none;padding:12px 20px;border-radius:20px;font-weight:bold}
 </style>
 </head>
 <body>
 <div id="top">PizChat AI - Ask Me Anything</div>
-<div id="chat">
-<div class="ai">Hello boss! I be PizChat AI. Ask me anything, I go answer you sharp sharp.</div>
-</div>
-<div id="box">
-<input id="q" placeholder="Ask anything..." autocomplete="off">
-<button id="sendBtn">Send</button>
-</div>
+<div id="chat"><div class="ai">Hello boss! I be PizChat AI. Ask me anything.</div></div>
+<div id="box"><input id="q" placeholder="Ask anything..."><button id="sendBtn">Send</button></div>
 <script>
-const API_KEY = "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
-
-async function send(){
-  let input = document.getElementById('q');
-  let text = input.value.trim();
+function send(){
+  var input = document.getElementById('q');
+  var text = input.value.trim();
   if(!text) return;
-  let chat = document.getElementById('chat');
+  var chat = document.getElementById('chat');
   chat.innerHTML += '<div class="me">'+text+'</div>';
   input.value = '';
-  let thinking = document.createElement('div');
-  thinking.className = 'ai';
-  thinking.textContent = 'PizChat dey think...';
-  chat.appendChild(thinking);
-  window.scrollTo(0, document.body.scrollHeight);
-  try{
-    let res = await fetch("https://api.groq.com/openai/v1/chat/completions", {
-      method: "POST",
-      headers: {"Content-Type": "application/json", "Authorization": "Bearer " + API_KEY},
-      body: JSON.stringify({model: "llama-3.3-70b-versatile", messages: [{role: "system", content: "You are PizChat AI, a friendly helpful assistant. Answer in simple clear English, sometimes with Nigerian Pidgin flavour."}, {role: "user", content: text}]})
-    });
-    let data = await res.json();
-    if(data.choices && data.choices[0]){
-      thinking.textContent = data.choices[0].message.content;
-    } else {
-      thinking.textContent = "Sorry boss, Groq return error: " + JSON.stringify(data).slice(0,200);
-    }
-  } catch(e){
-    thinking.textContent = "Sorry boss, network wahala. Check internet and try again. Error: " + e.message;
-  }
+  chat.innerHTML += '<div class="ai">I hear you boss! You say: '+text+' — Button don work now!</div>';
   window.scrollTo(0, document.body.scrollHeight);
 }
-
 document.getElementById('sendBtn').addEventListener('click', send);
-document.getElementById('q').addEventListener('keydown', function(e){ if(e.key === 'Enter'){ send(); } });
+document.getElementById('q').addEventListener('keydown', function(e){ if(e.key==='Enter'){ send(); } });
 </script>
 </body>
 </html>
