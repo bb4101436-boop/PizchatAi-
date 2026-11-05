@@ -45,7 +45,8 @@ chat.innerHTML+=`<div class="msg ai" id="tmp">Thinking...</div>`;
 try{
 let r=await fetch('/api/chat',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({message:q})});
 let d=await r.json();
-document.getElementById('tmp').textContent=d.answer||'No answer';
+let ans=d.answer||d.reply||d.text||d.response||(d.choices&&d.choices[0].message.content)||'No answer';
+document.getElementById('tmp').textContent=ans;
 }catch(e){document.getElementById('tmp').textContent='Network error, try again';}
 window.scrollTo(0,document.body.scrollHeight);
 }
