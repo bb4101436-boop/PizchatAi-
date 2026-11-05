@@ -7,7 +7,7 @@ export default async function handler(req, res) {
       method: 'POST',
       headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${process.env.GROQ_API_KEY}` },
       body: JSON.stringify({
-        model: 'llama-3.3-70b-versatile',
+        model: 'llama-3.1-8b-instant
         messages: [
           { role: 'system', content: 'You are PizChat, a friendly, simple, smart AI. Explain things simply like user is 12 if they ask. Be short, clear, fun.' },
           { role: 'user', content: message }
