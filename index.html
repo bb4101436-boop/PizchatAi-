@@ -1,94 +1,55 @@
 <!DOCTYPE html>
-<html lang="en">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>PizChat</title>
+<html><head><meta name="viewport" content="width=device-width,initial-scale=1">
 <style>
-*{margin:0;padding:0;box-sizing:border-box;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif}
-body{background:#000;display:flex;justify-content:center;min-height:100vh}
-.app{width:100%;max-width:430px;background:#0a0f0a;min-height:100vh;display:flex;flex-direction:column;position:relative;overflow:hidden}
-/* HEADER */
-.header{background:linear-gradient(135deg,#3a6b1e 0%,#1a3d0f 60%,#0f2a08 100%);padding:38px 20px 18px;border-radius:0 0 28px 28px;display:flex;justify-content:space-between;align-items:center}
-.logo{display:flex;align-items:center;gap:6px}
-.logo-star{font-size:34px;color:#c6ff7a;text-shadow:0 0 18px #a3e635}
-.logo h1{color:#fff;font-size:34px;font-weight:900;letter-spacing:-1px}
-.header-icons{display:flex;gap:18px;color:#d9f99d;font-size:22px}
-/* BODY */
-.body{padding:20px 16px 110px;flex:1;overflow-y:auto}
-.greet{color:#a3a3a3;font-size:19px;margin-bottom:2px}
-.greet2{color:#fff;font-size:25px;font-weight:800;line-height:1.2;margin-bottom:18px}
-.sug-title{color:#d9f99d;font-size:13px;margin-bottom:10px}
-.cards{display:flex;gap:10px;margin-bottom:22px}
-.card{flex:1;background:linear-gradient(180deg,#2d4a14,#16280a);border-radius:18px;padding:16px 8px;text-align:center;cursor:pointer}
-.card .icon{font-size:28px;margin-bottom:10px}
-.card p{color:#d9f99d;font-size:12.5px;line-height:1.3;font-weight:600}
-/* CHAT */
-.msg{margin-bottom:16px;display:flex;flex-direction:column}
-.msg.ai{flex-direction:row;gap:8px;align-items:flex-start}
-.ai-ava{width:32px;height:32px;background:#1e3a0f;border:1px solid #4d7c0f;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0}
-.bubble{max-width:82%;padding:13px 15px;font-size:14.5px;line-height:1.45;border-radius:20px}
-.ai .bubble{background:#e9e9e9;color:#111;border-bottom-left-radius:6px}
-.user{align-items:flex-end}
-.user .bubble{background:#a3e635;color:#111;font-weight:500;border-bottom-right-radius:6px}
-.time{font-size:11px;color:#737373;margin-top:4px;margin-left:42px}
-.user .time{margin-left:0;margin-right:4px}
-/* INPUT */
-.input-bar{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:430px;padding:12px 14px 20px;background:#0a0f0a;display:flex;gap:8px;align-items:center}
-.input-wrap{flex:1;background:#2a2a2a;border-radius:999px;display:flex;align-items:center;padding:4px 4px 4px 8px}
-.plus{width:32px;height:32px;background:#a3e635;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:22px;color:#111;flex-shrink:0}
-.input-wrap input{flex:1;background:transparent;border:none;outline:none;color:#fff;padding:10px 8px;font-size:15px}
-.input-wrap input::placeholder{color:#888}
-.mic{font-size:20px;color:#aaa;padding:0 6px}
-.send{width:56px;height:56px;background:#a3e635;border:none;border-radius:50%;font-size:26px;cursor:pointer;flex-shrink:0;box-shadow:0 4px 20px rgba(163,230,53,.4)}
-</style>
-</head>
+*{box-sizing:border-box}
+body{margin:0;background:#000;color:#fff;font-family:sans-serif;padding-bottom:80px}
+header{padding:16px;font-size:22px;font-weight:700}
+.cards{display:flex;gap:10px;padding:0 16px;overflow:auto}
+.card{background:#1a1a1a;padding:12px;border-radius:14px;min-width:140px;font-size:14px}
+#chat{padding:16px;display:flex;flex-direction:column;gap:12px}
+.msg{max-width:85%;padding:12px 14px;border-radius:16px;line-height:1.5;font-size:15px}
+.user{background:#a3e635;color:#000;align-self:flex-end}
+.ai{background:#1e1e1e;align-self:flex-start}
+.input-bar{display:flex;align-items:center;gap:8px;padding:10px;background:#111;position:fixed;bottom:0;left:0;right:0}
+.input-wrap{flex:1;display:flex;align-items:center;gap:6px;background:#222;border-radius:25px;padding:5px 8px}
+.input-wrap input{flex:1;min-width:0;background:transparent;border:none;outline:none;color:#fff;font-size:16px;padding:10px 4px}
+.plus,.mic{width:36px;height:36px;border:none;border-radius:50%;background:#333;color:#fff;font-size:16px;flex-shrink:0}
+.send{width:46px;height:46px;min-width:46px;border:none;border-radius:50%;background:#a3e635;font-size:18px;flex-shrink:0}
+</style></head>
 <body>
-<div class="app">
-  <div class="header">
-    <div class="logo"><span class="logo-star">✦</span><h1>PizChat</h1></div>
-    <div class="header-icons"><span>🔍</span><span>🔔</span></div>
-  </div>
+<header>PizChat AI</header>
+<div class="cards">
+<div class="card" onclick="ask('Draft an email for me')">Draft an email for me</div>
+<div class="card" onclick="ask('Create a study plan')">Create a study plan</div>
+<div class="card" onclick="ask('Brainstorm creative ideas')">Brainstorm ideas</div>
+</div>
+<div id="chat"><div class="msg ai">Good evening, Mia ✨ How can I help today?</div></div>
 
-  <div class="body" id="chat">
-    <p class="greet">Good evening, Mia —</p>
-    <p class="greet2">how can I help today?</p>
-    <p class="sug-title">✦ Suggestions</p>
-    <div class="cards">
-      <div class="card" onclick="ask('Draft an email for me')"><div class="icon">💡</div><p>Draft an email<br>for me</p></div>
-      <div class="card" onclick="ask('Create a study plan')"><div class="icon">✎</div><p>Create a<br>study plan</p></div>
-      <div class="card" onclick="ask('Brainstorm creative ideas')"><div class="icon">📍</div><p>Brainstorm<br>creative<br>ideas</p></div>
-    </div>
-
-    <div class="msg ai"><div class="ai-ava">✦</div><div><div class="bubble">Sure! I can break it down simply or go deep — what level are you looking for?</div><div class="time">Just now • PizChat</div></div></div>
-    <div class="msg user"><div class="bubble">Keep it simple, like I'm 12 years old</div><div class="time">Just now</div></div>
-    <div class="msg ai"><div class="ai-ava">✦</div><div><div class="bubble">Got it! ✨ Imagine atoms are like tiny Lego blocks that make up everything — your phone, water, even you. They stick together in different ways to create the world around us. Want me to give you an example with something fun, like pizza or toys? ✨</div><div class="time">Just now • PizChat</div></div></div>
-  </div>
-
-  <div class="input-bar">
-    <div class="input-wrap"><span class="plus">+</span><input id="inp" placeholder="Ask anything..."><span class="mic">🎙️</span></div>
-    <button class="send" onclick="send()">➤</button>
-  </div>
+<div class="input-bar">
+<div class="input-wrap">
+<button class="plus" onclick="alert('Plus: Photo / Clear Chat')">+</button>
+<input id="inp" placeholder="Ask anything...">
+<button class="mic" onclick="startMic()">🎙️</button>
+</div>
+<button class="send" onclick="send()">➤</button>
 </div>
 
 <script>
 const chat=document.getElementById('chat');
 const inp=document.getElementById('inp');
-function addUser(t){chat.innerHTML+=`<div class="msg user"><div class="bubble">${t}</div><div class="time">Just now</div></div>`;chat.scrollTop=chat.scrollHeight;}
-function addAI(t){chat.innerHTML+=`<div class="msg ai"><div class="ai-ava">✦</div><div><div class="bubble">${t}</div><div class="time">Just now • PizChat</div></div></div>`;chat.scrollTop=chat.scrollHeight;}
-function ask(t){inp.value=t;send();}
+function ask(t){inp.value=t;send()}
 async function send(){
-  let q=inp.value.trim(); if(!q) return; addUser(q); inp.value='';
-  addAI('Thinking...');
-  try{
-    let r=await fetch('/api/chat',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({message:q})});
-    let d=await r.json();
-    document.querySelectorAll('.ai .bubble').forEach(b=>{if(b.textContent==='Thinking...') b.textContent=d.reply||d.answer||"I got you! Tell me more."});
-  }catch(e){
-    document.querySelectorAll('.ai .bubble').forEach(b=>{if(b.textContent==='Thinking...') b.textContent="Got it! Tell me more about that, I go explain am for you simply."});
-  }
+let q=inp.value.trim();if(!q)return;
+chat.innerHTML+=`<div class="msg user">${q}</div>`;inp.value='';
+chat.innerHTML+=`<div class="msg ai" id="tmp">Thinking...</div>`;
+try{
+let r=await fetch('/api/chat',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({message:q})});
+let d=await r.json();
+document.getElementById('tmp').textContent=d.answer||'No answer';
+}catch(e){document.getElementById('tmp').textContent='Network error, try again';}
+window.scrollTo(0,document.body.scrollHeight);
 }
-inp.addEventListener('keydown',e=>{if(e.key==='Enter') send();});
+function startMic(){alert('Mic: Hold to talk - coming soon');}
+inp.addEventListener('keydown',e=>{if(e.key==='Enter')send()});
 </script>
-</body>
-</html>
+</body></html>
