@@ -1,52 +1,86 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
+<meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>PizChat AI</title>
 <style>
-body{margin:0;font-family:Arial;background:#f2f2f2}
-#top{background:#009900;color:white;padding:15px;text-align:center;font-weight:bold}
-#chat{padding:15px;padding-bottom:120px}
-.me{background:white;padding:10px;border-radius:10px;margin:10px 0;margin-left:40px;line-height:1.5}
-.ai{background:#e6ffe6;padding:10px;border-radius:10px;margin:10px 0;margin-right:40px;line-height:1.5}
-#box{position:fixed;bottom:0;left:0;right:0;display:flex;background:white;padding:10px;gap:8px}
-#q{flex:1;padding:12px;border-radius:20px;border:1px solid #ccc;font-size:16px;outline:none}
-#sendBtn{background:#009900;color:white;border:none;padding:12px 20px;border-radius:20px;font-weight:bold;font-size:16px}
+*{margin:0;padding:0;box-sizing:border-box;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif}
+body{background:#f2f2f2;min-height:100svh;display:flex;justify-content:center}
+.phone{width:100%;max-width:480px;background:#f2f2f2;min-height:100svh;display:flex;flex-direction:column}
+/* HEADER - EXACT LIKE SCREENSHOT */
+header{background:#2fa32f;padding:16px 14px;text-align:center;position:sticky;top:0;z-index:10}
+header h1{color:#fff;font-size:19px;font-weight:600;letter-spacing:.2px}
+/* CHAT AREA */
+.main{flex:1;padding:18px 14px 10px;overflow-y:auto;display:flex;flex-direction:column;gap:14px}
+.msg{max-width:85%;padding:13px 14px;border-radius:10px;font-size:16px;line-height:1.45;white-space:pre-wrap;word-break:break-word}
+.msg.ai{background:#d9f2d9;color:#111;align-self:flex-start;border-radius:10px}
+.msg.me{background:#fff;color:#111;align-self:flex-end;box-shadow:0 1px 3px rgba(0,0,0,.08)}
+.msg.thinking{background:#d9f2d9;color:#111;align-self:flex-start;display:flex;gap:6px;align-items:center}
+.dot{width:7px;height:7px;background:#2fa32f;border-radius:50%;animation:b 1s infinite}
+.dot:nth-child(2){animation-delay:.15s}.dot:nth-child(3){animation-delay:.3s}
+@keyframes b{50%{transform:translateY(-3px);opacity:.5}}
+/* BOTTOM - EXACT LIKE SCREENSHOT */
+.input-bar{background:#f2f2f2;padding:10px 10px 18px;display:flex;gap:8px;align-items:center;position:sticky;bottom:0}
+.input-wrap{flex:1;background:#fff;border:1px solid #ddd;border-radius:999px;display:flex;align-items:center;padding:0 14px;min-width:0;height:48px}
+.input-wrap input{flex:1;border:0;outline:none;font-size:15px;background:transparent;min-width:0;color:#111}
+.input-wrap input::placeholder{color:#888}
+.send{background:#1e9e1e;border:0;color:#fff;font-size:16px;font-weight:600;padding:0 22px;height:48px;border-radius:999px;cursor:pointer;flex-shrink:0}
+.send:active{transform:scale(.97)}
 </style>
 </head>
 <body>
-<div id="top">PizChat AI - Ask Me Anything</div>
-<div id="chat"><div class="ai">Hello boss! I be PizChat AI. Ask me anything, I go answer you sharp sharp.</div></div>
-<div id="box"><input id="q" placeholder="Ask anything..." autocomplete="off"><button id="sendBtn">Send</button></div>
+<div class="phone">
+<header><h1>PizChat AI - Ask Me Anything</h1></header>
+
+<div class="main" id="messages">
+<div class="msg ai">Hello boss! I be PizChat AI. Ask me anything, I go answer you sharp sharp.</div>
+</div>
+
+<div class="input-bar">
+<div class="input-wrap"><input id="input" placeholder="Ask anything..." onkeydown="if(event.key==='Enter')send()"></div>
+<button class="send" onclick="send()">Send</button>
+</div>
+</div>
+
 <script>
-async function send(){
-  var input = document.getElementById('q');
-  var text = input.value.trim();
-  if(!text) return;
-  var chat = document.getElementById('chat');
-  chat.innerHTML += '<div class="me">'+text+'</div>';
-  input.value = '';
-  var thinking = document.createElement('div');
-  thinking.className = 'ai';
-  thinking.textContent = 'PizChat dey think...';
-  chat.appendChild(thinking);
-  window.scrollTo(0, document.body.scrollHeight);
-  try{
-    var prompt = "You are PizChat AI, a friendly helpful assistant. Answer in simple clear English, sometimes with Nigerian Pidgin flavour. User asks: " + text;
-    var res = await fetch("https://text.pollinations.ai/" + encodeURIComponent(prompt));
-    var answer = await res.text();
-    if(answer && answer.length > 2){
-      thinking.textContent = answer;
-    } else {
-      thinking.textContent = "Sorry boss, I no get answer now. Try again.";
-    }
-  } catch(e){
-    thinking.textContent = "Sorry boss, network wahala. Check internet and try again.";
-  }
+// KEEP YOUR WORKING BACKEND - NO CHANGE
+const API_URL = "/api/chat";
+let history = [{role:"assistant", text:"Hello boss! I be PizChat AI. Ask me anything, I go answer you sharp sharp."}];
+try{ let saved = JSON.parse(localStorage.getItem('piz_history')||'[]'); if(saved.length) history = saved; }catch(e){}
+
+function render(){
+  let b = document.getElementById('messages');
+  b.innerHTML = '';
+  history.forEach(m=>{
+    b.innerHTML += `<div class="msg ${m.role==='user'?'me':'ai'}">${esc(m.text)}</div>`;
+  });
   window.scrollTo(0, document.body.scrollHeight);
 }
-document.getElementById('sendBtn').addEventListener('click', send);
-document.getElementById('q').addEventListener('keydown', function(e){ if(e.key==='Enter'){ send(); } });
+function esc(t){return String(t).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')}
+
+async function send(){
+  let inp = document.getElementById('input');
+  let txt = inp.value.trim(); if(!txt) return;
+  inp.value=''; add('user', txt);
+
+  let b = document.getElementById('messages');
+  b.innerHTML += `<div class="msg thinking" id="typing">PizChat dey think... <span class="dot"></span><span class="dot"></span><span class="dot"></span></div>`;
+  window.scrollTo(0, document.body.scrollHeight);
+
+  try{
+    let ctrl = new AbortController(); setTimeout(()=>ctrl.abort(), 30000);
+    let r = await fetch(API_URL, {method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({messages:[{role:'user', content: txt}]}), signal: ctrl.signal});
+    let d = await r.json();
+    document.getElementById('typing')?.remove();
+    add('assistant', d.reply || d.message || d.text || "No reply, try again");
+  }catch(e){
+    document.getElementById('typing')?.remove();
+    add('assistant', "Network wahala, try again — check internet and resend.");
+  }
+}
+function add(role,text){ history.push({role, text}); localStorage.setItem('piz_history', JSON.stringify(history)); render(); }
+render();
 </script>
 </body>
 </html>
