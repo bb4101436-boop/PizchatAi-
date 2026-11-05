@@ -36,7 +36,6 @@ input{flex:1;padding:12px;border-radius:20px;border:none;background:#222;color:#
 </style></head>
 <body>
 <div id="top"><button class="pencil" onclick="openSettings()">✏️</button><h2 style="margin:0">PizChat AI</h2><button onclick="newChat()">+ New Chat</button></div>
-
 <div id="chat">
 <div id="chips">
 <button onclick="quick('Write a short story for me')">✍️ Write a story</button>
@@ -44,11 +43,10 @@ input{flex:1;padding:12px;border-radius:20px;border:none;background:#222;color:#
 <button onclick="quick('Give me a business idea in Nigeria')">💡 Business idea</button>
 <button onclick="quick('Help me with my homework')">📚 Homework</button>
 </div>
-<div class="ai">Hello ✨ How can I help today? Ask question, ask for code, generate image, or upload your photo to change it.</div>
+<div class="ai">Hello ✨ How can I help today? Ask question, ask for code, generate image, or upload your photo to edit only what you ask.</div>
 </div>
-
 <div id="sidePopup">
-<button onclick="document.getElementById('uploadInput').click()">📸 Upload Photo - Change Clothes / Style</button>
+<button onclick="document.getElementById('uploadInput').click()">📸 Upload Photo - Edit Only What You Ask</button>
 <button onclick="quick('Write a short story for me')">✍️ Write a story</button>
 <button onclick="quick('Explain like I am 5')">🧒 Explain like I am 5</button>
 <button onclick="quick('Give me a business idea in Nigeria')">💡 Business idea</button>
@@ -57,9 +55,7 @@ input{flex:1;padding:12px;border-radius:20px;border:none;background:#222;color:#
 <button onclick="quick('Write HTML code for a login page')">💻 Write Code</button>
 <button onclick="togglePopup()">✖️ Close</button>
 </div>
-
 <input type="file" id="uploadInput" accept="image/*" hidden onchange="handleUpload(event)">
-
 <div id="overlay" onclick="closeSettings()"></div>
 <div id="settingsPanel">
 <h3>✏️ Settings</h3>
@@ -71,7 +67,6 @@ input{flex:1;padding:12px;border-radius:20px;border:none;background:#222;color:#
 <div class="setRow"><button onclick="clearChat()">🗑️ Clear Chat</button><button onclick="newChat();closeSettings()">✨ Start New Chat</button><button onclick="closeSettings()" style="background:#222;color:#fff">Close Settings</button></div>
 <p style="font-size:12px;color:#888;text-align:center">PizChat AI • Version 1.0 • Built by PizChat</p>
 </div>
-
 <div id="bar">
 <button class="icon" onclick="togglePopup()">+</button>
 <button class="icon" onclick="mic()">🎤</button>
@@ -79,114 +74,114 @@ input{flex:1;padding:12px;border-radius:20px;border:none;background:#222;color:#
 <button class="icon" id="send" onclick="send()">➤</button>
 </div>
 <script>
-let history=[];
-let busy=false;
-let chipsEl=document.getElementById('chips');
-let popup=document.getElementById('sidePopup');
-let input=document.getElementById('q');
-let lastUploadedImg='';
+let history=[]; let busy=false; let chipsEl=document.getElementById('chips'); let popup=document.getElementById('sidePopup'); let input=document.getElementById('q'); let lastUploadedImg=''; let lastUploadedUrl='';
 let settings = JSON.parse(localStorage.getItem('pizchat_settings')||'{"lang":"mix","style":"normal","theme":"dark","font":"15"}');
-document.getElementById('setLang').value=settings.lang;
-document.getElementById('setStyle').value=settings.style;
-document.getElementById('setTheme').value=settings.theme;
-document.getElementById('setFont').value=settings.font;
+document.getElementById('setLang').value=settings.lang; document.getElementById('setStyle').value=settings.style; document.getElementById('setTheme').value=settings.theme; document.getElementById('setFont').value=settings.font;
 applySettings();
 function applySettings(){ document.body.classList.toggle('light', settings.theme==='light'); document.body.style.fontSize=settings.font+'px'; }
 function saveSettings(){ settings={lang:document.getElementById('setLang').value, style:document.getElementById('setStyle').value, theme:document.getElementById('setTheme').value, font:document.getElementById('setFont').value}; localStorage.setItem('pizchat_settings', JSON.stringify(settings)); applySettings(); }
 function openSettings(){ document.getElementById('settingsPanel').style.display='block'; document.getElementById('overlay').style.display='block'; }
 function closeSettings(){ document.getElementById('settingsPanel').style.display='none'; document.getElementById('overlay').style.display='none'; }
 function clearChat(){ history=[]; document.getElementById('chat').innerHTML='<div class="ai">Chat cleared ✨ Wetin you wan talk about?</div>'; closeSettings(); }
-let today=new Date().toDateString();
-let lastDay=localStorage.getItem('pizchat_day');
-if(lastDay!==today){ localStorage.setItem('pizchat_day', today); chipsEl.style.display='flex'; } else { chipsEl.style.display='flex'; }
+let today=new Date().toDateString(); let lastDay=localStorage.getItem('pizchat_day'); if(lastDay!==today){ localStorage.setItem('pizchat_day', today); chipsEl.style.display='flex'; } else { chipsEl.style.display='flex'; }
 function togglePopup(){ if(popup.style.display==='flex'){ popup.style.display='none'; } else { popup.style.display='flex'; } }
-function newChat(){ history=[]; lastUploadedImg=''; document.getElementById('chat').innerHTML='<div id="chips">'+chipsEl.innerHTML+'</div><div class="ai">Fresh chat ✨ Wetin you wan talk about?</div>'; chipsEl=document.getElementById('chips'); chipsEl.style.display='flex'; popup.style.display='none'; closeSettings(); }
+function newChat(){ history=[]; lastUploadedImg=''; lastUploadedUrl=''; document.getElementById('chat').innerHTML='<div id="chips">'+chipsEl.innerHTML+'</div><div class="ai">Fresh chat ✨ Wetin you wan talk about?</div>'; chipsEl=document.getElementById('chips'); chipsEl.style.display='flex'; popup.style.display='none'; closeSettings(); }
 function quick(t){ popup.style.display='none'; document.getElementById('q').value=t; send(); }
 input.addEventListener('input', ()=>{ if(input.value.trim().length>0){ if(chipsEl) chipsEl.style.display='none'; popup.style.display='none'; } else { if(history.length===0 && chipsEl) chipsEl.style.display='flex'; } });
 function mic(){ if(!('webkitSpeechRecognition' in window || 'SpeechRecognition' in window)){ alert('Mic no work for this browser, use Chrome'); return; } let Rec = window.SpeechRecognition || window.webkitSpeechRecognition; let r = new Rec(); r.lang='en-NG'; r.start(); r.onresult = e=>{ document.getElementById('q').value = e.results[0][0].transcript; send(); }; }
 
+// SMART EDIT - ONLY CHANGE WHAT USER ASK, KEEP FACE SAME
+function buildEditPrompt(raw){
+  let t = raw.toLowerCase();
+  // Base rule: NEVER change face, NEVER cartoon unless user ask cartoon
+  let keep = 'Edit this exact photo. Keep the exact same person, same face, same skin tone, same hair, same body shape, same pose, same background. DO NOT change face. DO NOT make cartoon. DO NOT make anime. DO NOT generate a different person. ONLY change what is asked: ';
+  if(t.includes('army') || t.includes('military') || t.includes('soldier') || t.includes('uniform')){
+    return keep + 'Change ONLY the clothes to a Nigerian Army uniform, military camouflage uniform with army cap, realistic photo, same face exactly as original. ' + raw;
+  }
+  if(t.includes('cartoon') || t.includes('pixar') || t.includes('anime')){
+    return 'Transform this exact photo into cartoon style, keep same person and same face shape, Pixar 3D cartoon style, big cartoon eyes, colorful, cartoon illustration. ' + raw;
+  }
+  if(t.includes('agbada') || t.includes('native') || t.includes('ankara')){
+    return keep + 'Change ONLY the clothes to beautiful Nigerian Agbada, traditional wear, realistic photo. ' + raw;
+  }
+  if(t.includes('suit')){
+    return keep + 'Change ONLY the clothes to elegant black suit, professional photoshoot, realistic photo. ' + raw;
+  }
+  if(t.includes('gown') || t.includes('dress')){
+    return keep + 'Change ONLY the clothes to ' + raw + ', realistic photo. ';
+  }
+  return keep + raw + ', realistic photo, keep everything else exactly same.';
+}
+async function uploadToTemp(file){
+  try{
+    let fd=new FormData(); fd.append('file', file);
+    let r=await fetch('https://0x0.st',{method:'POST',body:fd});
+    let url=(await r.text()).trim();
+    if(url.startsWith('http')) return url;
+  }catch(e){}
+  return '';
+}
 function handleUpload(e){
-  let file=e.target.files[0];
-  if(!file) return;
-  popup.style.display='none';
-  if(chipsEl) chipsEl.style.display='none';
+  let file=e.target.files[0]; if(!file) return; popup.style.display='none'; if(chipsEl) chipsEl.style.display='none';
   let reader=new FileReader();
   reader.onload=function(ev){
     lastUploadedImg=ev.target.result;
     let chat=document.getElementById('chat');
     chat.innerHTML+='<div class="me">My photo 📸<img src="'+lastUploadedImg+'"></div>';
-    let aiDiv=document.createElement('div');
-    aiDiv.className='ai';
-    aiDiv.innerHTML='I don see your photo ✨ Wetin you want make I do with am? Tap one, or type your own like "change my clothes to Agbada" <div class="transBtns"><button onclick="transformPhoto(\'elegant suit, professional photoshoot\')">👔 Change Clothes - Suit</button><button onclick="transformPhoto(\'beautiful Agbada, Nigerian fashion\')">👘 Agbada</button><button onclick="transformPhoto(\'cartoon style, Pixar 3D\')">🎨 Cartoon</button><button onclick="transformPhoto(\'professional corporate headshot, studio light\')">💼 Professional</button><button onclick="transformPhoto(\'beautiful dress, wedding style\')">✨ Beautiful Dress</button></div>';
-    chat.appendChild(aiDiv);
-    window.scrollTo(0,document.body.scrollHeight);
+    let aiDiv=document.createElement('div'); aiDiv.className='ai';
+    aiDiv.innerHTML='I don see your photo ✨ Now tell me EXACTLY wetin to change. I go change ONLY that one. Example: "only change my clothes to army uniform" <div class="transBtns"><button onclick="transformPhoto(\'only change my clothes to army uniform\')">🪖 Army Uniform</button><button onclick="transformPhoto(\'only change my clothes to elegant suit\')">👔 Suit Only</button><button onclick="transformPhoto(\'only change my clothes to Agbada\')">👘 Agbada Only</button><button onclick="transformPhoto(\'make me cartoon\')">🎨 Cartoon</button></div><small>I go keep your face same, I no go touch am.</small>';
+    chat.appendChild(aiDiv); window.scrollTo(0,document.body.scrollHeight);
+    // Upload in background for real edit
+    uploadToTemp(file).then(u=>{ lastUploadedUrl=u; });
   };
-  reader.readAsDataURL(file);
-  e.target.value='';
+  reader.readAsDataURL(file); e.target.value='';
 }
 function transformPhoto(style){
   if(!lastUploadedImg){ alert('Upload photo first'); return; }
+  doEdit(style);
+}
+function doEdit(userText){
   let chat=document.getElementById('chat');
-  let div=document.createElement('div');
-  div.className='ai';
-  div.textContent='Creating your new look: '+style+' ...';
-  chat.appendChild(div);
-  window.scrollTo(0,document.body.scrollHeight);
-  let prompt = 'Portrait photo of a person, ' + style + ', high quality, realistic, beautiful lighting';
-  let imgUrl = 'https://image.pollinations.ai/prompt/' + encodeURIComponent(prompt) + '?width=512&height=512&seed=' + Math.floor(Math.random()*99999) + '&nologo=true';
+  let div=document.createElement('div'); div.className='ai'; div.textContent='Editing your photo... I go change ONLY: '+userText+' - your face go remain same, no cartoon...';
+  chat.appendChild(div); window.scrollTo(0,document.body.scrollHeight);
+  let editPrompt = buildEditPrompt(userText);
+  let imgUrl;
+  if(lastUploadedUrl){
+    imgUrl = 'https://image.pollinations.ai/prompt/' + encodeURIComponent(editPrompt) + '?width=512&height=512&seed=' + Math.floor(Math.random()*99999) + '&nologo=true&model=flux&image=' + encodeURIComponent(lastUploadedUrl);
+  } else {
+    imgUrl = 'https://image.pollinations.ai/prompt/' + encodeURIComponent(editPrompt) + '?width=512&height=512&seed=' + Math.floor(Math.random()*99999) + '&nologo=true&model=flux';
+  }
   setTimeout(()=>{
-    div.innerHTML='Here is your new look ✨<br>Original photo:<br><img src="'+lastUploadedImg+'"><br>New version - '+style+':<br><img src="'+imgUrl+'"><br><div class="transBtns"><button onclick="transformPhoto(\'elegant suit\')">👔 Try Suit</button><button onclick="transformPhoto(\'cartoon Pixar\')">🎨 Try Cartoon</button><button onclick="transformPhoto(\'Agbada Nigerian\')">👘 Try Agbada</button></div><small>Tip: Type your own - e.g. "Change my clothes to red gown"</small>';
+    div.innerHTML='Done ✨ I change ONLY wetin you ask: <b>'+userText+'</b><br>Your original:<br><img src="'+lastUploadedImg+'"><br>Edited version - face kept same, only clothes changed:<br><img src="'+imgUrl+'"><br><small>If face still change small, try again - e dey use your real photo now.</small><br><div class="transBtns"><button onclick="transformPhoto(\'only change my clothes to army uniform\')">🪖 Army Again</button><button onclick="transformPhoto(\'only change my clothes to suit\')">👔 Suit</button></div>';
     window.scrollTo(0,document.body.scrollHeight);
-  },800);
+  },900);
 }
 function isImageRequest(t){ t=t.toLowerCase(); return t.includes('generate image')||t.includes('create image')||t.includes('draw')||t.includes('picture of')||t.includes('generate picture')||t.includes('make an image'); }
 function isCodeRequest(t){ t=t.toLowerCase(); return t.includes('code')||t.includes('html')||t.includes('python')||t.includes('javascript')||t.includes('website')||t.includes('app code')||t.includes('write a program'); }
-function isPhotoEditRequest(t){ t=t.toLowerCase(); return (t.includes('change my clothes')||t.includes('change clothes')||t.includes('make me cartoon')||t.includes('make my photo')||t.includes('my photo')||t.includes('my picture')) && lastUploadedImg; }
-
+function isPhotoEditRequest(t){ t=t.toLowerCase(); return lastUploadedImg && (t.includes('change')||t.includes('army')||t.includes('uniform')||t.includes('clothes')||t.includes('cartoon')||t.includes('agbada')||t.includes('suit')||t.includes('my photo')||t.includes('my picture')); }
 async function send(){
-  if(busy) return;
-  let text=input.value.trim();
-  if(!text) return;
-  let chat=document.getElementById('chat');
-  if(chipsEl) chipsEl.style.display='none';
-  popup.style.display='none';
-  chat.innerHTML+='<div class="me">'+text+'</div>';
-  history.push({role:'user',content:text});
-  input.value='';
-  busy=true;
-  let think=document.createElement('div');
-  think.className='ai'; think.textContent='Thinking...';
-  chat.appendChild(think);
-  window.scrollTo(0,document.body.scrollHeight);
-
+  if(busy) return; let text=input.value.trim(); if(!text) return;
+  let chat=document.getElementById('chat'); if(chipsEl) chipsEl.style.display='none'; popup.style.display='none';
+  chat.innerHTML+='<div class="me">'+text+'</div>'; history.push({role:'user',content:text}); input.value=''; busy=true;
+  let think=document.createElement('div'); think.className='ai'; think.textContent='Thinking...'; chat.appendChild(think); window.scrollTo(0,document.body.scrollHeight);
   if(isPhotoEditRequest(text)){
-    let prompt = 'Portrait photo of a person, ' + text + ', high quality, realistic';
-    let imgUrl = 'https://image.pollinations.ai/prompt/' + encodeURIComponent(prompt) + '?width=512&height=512&seed=' + Math.floor(Math.random()*99999) + '&nologo=true';
-    think.innerHTML='Done ✨ Based on your photo, here is: '+text+'<br><img src="'+imgUrl+'">';
+    let editPrompt = buildEditPrompt(text);
+    let imgUrl;
+    if(lastUploadedUrl){ imgUrl='https://image.pollinations.ai/prompt/'+encodeURIComponent(editPrompt)+'?width=512&height=512&seed='+Math.floor(Math.random()*99999)+'&nologo=true&model=flux&image='+encodeURIComponent(lastUploadedUrl); }
+    else { imgUrl='https://image.pollinations.ai/prompt/'+encodeURIComponent(editPrompt)+'?width=512&height=512&seed='+Math.floor(Math.random()*99999)+'&nologo=true&model=flux'; }
+    think.innerHTML='Done ✨ I change ONLY: <b>'+text+'</b><br>Your face remain same, no cartoon.<br><img src="'+imgUrl+'">';
     busy=false; return;
   }
   if(isImageRequest(text)){
     let prompt = text.replace(/generate image of|generate image|create image of|create image|draw|picture of|make an image of/gi,'').trim() || text;
-    let imgUrl = 'https://image.pollinations.ai/prompt/' + encodeURIComponent(prompt) + '?width=512&height=512&seed=' + Math.floor(Math.random()*9999) + '&nologo=true';
-    think.innerHTML = 'Here is your image ✨<br><img src="'+imgUrl+'" onload="window.scrollTo(0,document.body.scrollHeight)"><br><small>'+prompt+'</small>';
-    history.push({role:'assistant',content:'Generated image: '+prompt});
-    busy=false; return;
+    let imgUrl = 'https://image.pollinations.ai/prompt/' + encodeURIComponent(prompt) + '?width=512&height=512&seed=' + Math.floor(Math.random()*9999) + '&nologo=true&model=flux';
+    think.innerHTML = 'Here is your image ✨<br><img src="'+imgUrl+'" onload="window.scrollTo(0,document.body.scrollHeight)"><br><small>'+prompt+'</small>'; history.push({role:'assistant',content:'Generated image: '+prompt}); busy=false; return;
   }
   let langText = settings.lang==='pidgin' ? ' Answer in Nigerian Pidgin only.' : settings.lang==='english' ? ' Answer in clear English only.' : ' Answer in English + Pidgin mix like PizChat.';
   let styleText = settings.style==='short' ? ' Keep answer very short.' : settings.style==='detailed' ? ' Give detailed full explanation.' : ' Give normal clear answer.';
-  let extra = '';
-  if(isCodeRequest(text)){ extra = ' You are an expert coder. Give complete working code, with explanation. Put code in code block. Do not cut code.'; }
-  else { extra = ' You can answer any question, write anything, help with anything.'; }
+  let extra = ''; if(isCodeRequest(text)){ extra = ' You are an expert coder. Give complete working code, with explanation. Put code in code block. Do not cut code.'; } else { extra = ' You can answer any question, write anything, help with anything.'; }
   let finalMsg = text + langText + styleText + extra;
-  try{
-    let res=await fetch('/api/chat',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({message:finalMsg,history:history})});
-    let d=await res.json();
-    let ans=d.answer||'No answer';
-    ans = ans.replace(/```/g,'<pre>');
-    think.innerHTML=ans;
-    history.push({role:'assistant',content:ans});
-  }catch(e){ think.textContent='Network error, try again'; }
-  busy=false;
+  try{ let res=await fetch('/api/chat',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({message:finalMsg,history:history})}); let d=await res.json(); let ans=d.answer||'No answer'; ans = ans.replace(/```/g,'<pre>'); think.innerHTML=ans; history.push({role:'assistant',content:ans}); }catch(e){ think.textContent='Network error, try again'; } busy=false;
 }
 input.addEventListener('keydown',e=>{ if(e.key==='Enter') send(); });
 document.addEventListener('click',e=>{ if(!e.target.closest('#sidePopup') && !e.target.closest('.icon')){ popup.style.display='none'; } });
