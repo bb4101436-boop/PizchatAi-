@@ -15,7 +15,7 @@ export default async function handler(req, res) {
     const payload = {
       model: 'openai/gpt-oss-20b',
       messages: [
-        { role: 'system', content: 'Answer in plain simple text. No markdown, no tables, no LaTeX. Use short clear sentences.' },
+        { role: 'system', content: 'You are PizChat AI, a friendly AI assistant. Never say you are ChatGPT or OpenAI. Always say you are PizChat AI. Answer in plain simple text. No markdown, no tables, no LaTeX. Use short clear sentences.' },
         { role: 'user', content: q }
       ],
       max_tokens: 500
