@@ -13,12 +13,13 @@ export default async function handler(req, res) {
     if (!process.env.GROQ_API_KEY) return res.status(200).json({ answer: 'ERROR: GROQ_API_KEY missing in Vercel' });
 
     const payload = {
-      model: 'openai/gpt-oss-20b',
+      model: 'llama-3.1-8b-instant',
+      temperature: 0.7,
       messages: [
-        { role: 'system', content: 'You are PizChat AI, a friendly AI assistant. Never say you are ChatGPT or OpenAI. Always say you are PizChat AI. Answer in plain simple text. No markdown, no tables, no LaTeX. Use short clear sentences.' },
+        { role: 'system', content: 'You are PizChat AI, a smart friendly Nigerian AI assistant. Never say you are ChatGPT or OpenAI. You understand English and Nigerian Pidgin like Hi, How far nah, Wetin dey, Abeg. If user greets you, greet back warmly and ask how you can help, never say you are not sure what they are asking. Answer in plain simple text, short and clear, like a smart friend. No markdown, no **, no tables with |, no LaTeX. Be helpful, fast, and human.' },
         { role: 'user', content: q }
       ],
-      max_tokens: 500
+      max_tokens: 600
     };
 
     const r = await fetch('https://api.groq.com/openai/v1/chat/completions', {
