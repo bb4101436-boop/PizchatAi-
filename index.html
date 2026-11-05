@@ -51,7 +51,7 @@ input{flex:1;padding:12px;border-radius:20px;border:none;background:#222;color:#
 <button onclick="quick('Explain like I am 5')">🧒 Explain like I am 5</button>
 <button onclick="quick('Give me a business idea in Nigeria')">💡 Business idea</button>
 <button onclick="quick('Help me with my homework')">📚 Homework</button>
-<button onclick="quick('Generate image of a beautiful Lagos city at sunset')">🎨 Generate Image</button>
+<button onclick="quick('Generate an image of a beautiful Lagos city at sunset')">🎨 Generate Image</button>
 <button onclick="quick('Write HTML code for a login page')">💻 Write Code</button>
 <button onclick="togglePopup()">✖️ Close</button>
 </div>
@@ -74,7 +74,7 @@ input{flex:1;padding:12px;border-radius:20px;border:none;background:#222;color:#
 <button class="icon" id="send" onclick="send()">➤</button>
 </div>
 <script>
-let history=[]; let busy=false; let chipsEl=document.getElementById('chips'); let popup=document.getElementById('sidePopup'); let input=document.getElementById('q'); let lastUploadedImg='';
+let history=[]; let busy=false; let chipsEl=document.getElementById('chips'); let popup=document.getElementById('sidePopup'); let input=document.getElementById('q'); let lastUploadedImg=''; let waitingForImageTopic=false;
 let settings = JSON.parse(localStorage.getItem('pizchat_settings')||'{"lang":"mix","style":"normal","theme":"dark","font":"15"}');
 document.getElementById('setLang').value=settings.lang; document.getElementById('setStyle').value=settings.style; document.getElementById('setTheme').value=settings.theme; document.getElementById('setFont').value=settings.font;
 applySettings();
@@ -82,18 +82,79 @@ function applySettings(){ document.body.classList.toggle('light', settings.theme
 function saveSettings(){ settings={lang:document.getElementById('setLang').value, style:document.getElementById('setStyle').value, theme:document.getElementById('setTheme').value, font:document.getElementById('setFont').value}; localStorage.setItem('pizchat_settings', JSON.stringify(settings)); applySettings(); }
 function openSettings(){ document.getElementById('settingsPanel').style.display='block'; document.getElementById('overlay').style.display='block'; }
 function closeSettings(){ document.getElementById('settingsPanel').style.display='none'; document.getElementById('overlay').style.display='none'; }
-function clearChat(){ history=[]; document.getElementById('chat').innerHTML='<div class="ai">Chat cleared ✨ Wetin you wan talk about?</div>'; closeSettings(); }
+function clearChat(){ history=[]; waitingForImageTopic=false; document.getElementById('chat').innerHTML='<div class="ai">Chat cleared ✨ Wetin you wan talk about?</div>'; closeSettings(); }
 function togglePopup(){ popup.style.display = popup.style.display==='flex' ? 'none' : 'flex'; }
-function newChat(){ history=[]; lastUploadedImg=''; document.getElementById('chat').innerHTML='<div id="chips">'+chipsEl.innerHTML+'</div><div class="ai">Fresh chat ✨ Wetin you wan talk about?</div>'; chipsEl=document.getElementById('chips'); chipsEl.style.display='flex'; popup.style.display='none'; closeSettings(); }
+function newChat(){ history=[]; lastUploadedImg=''; waitingForImageTopic=false; document.getElementById('chat').innerHTML='<div id="chips">'+chipsEl.innerHTML+'</div><div class="ai">Fresh chat ✨ Wetin you wan talk about?</div>'; chipsEl=document.getElementById('chips'); chipsEl.style.display='flex'; popup.style.display='none'; closeSettings(); }
 function quick(t){ popup.style.display='none'; document.getElementById('q').value=t; send(); }
 input.addEventListener('input', ()=>{ if(input.value.trim().length>0){ if(chipsEl) chipsEl.style.display='none'; popup.style.display='none'; } else { if(history.length===0 && chipsEl) chipsEl.style.display='flex'; } });
 function mic(){ if(!('webkitSpeechRecognition' in window || 'SpeechRecognition' in window)){ alert('Mic no work for this browser, use Chrome'); return; } let Rec = window.SpeechRecognition || window.webkitSpeechRecognition; let r = new Rec(); r.lang='en-NG'; r.start(); r.onresult = e=>{ document.getElementById('q').value = e.results[0][0].transcript; send(); }; }
 function handleUpload(e){ let file=e.target.files[0]; if(!file) return; popup.style.display='none'; if(chipsEl) chipsEl.style.display='none'; let reader=new FileReader(); reader.onload=function(ev){ lastUploadedImg=ev.target.result; let chat=document.getElementById('chat'); chat.innerHTML+='<div class="me">My photo 📸<img src="'+lastUploadedImg+'"></div>'; let aiDiv=document.createElement('div'); aiDiv.className='ai'; aiDiv.innerHTML='I don see your photo ✨ Tell me EXACTLY wetin to change. I go change ONLY that one, your face go remain same.<div class="transBtns"><button onclick="doEdit(\'only change my clothes to army uniform\')">🪖 Army Uniform</button><button onclick="doEdit(\'only change my clothes to elegant suit\')">👔 Suit Only</button><button onclick="doEdit(\'only change my clothes to Agbada\')">👘 Agbada Only</button><button onclick="doEdit(\'make me cartoon, Pixar style\')">🎨 Cartoon</button></div>'; chat.appendChild(aiDiv); window.scrollTo(0,document.body.scrollHeight); }; reader.readAsDataURL(file); e.target.value=''; }
 async function doEdit(userText){ if(!lastUploadedImg){ alert('Upload photo first'); return; } let chat=document.getElementById('chat'); let div=document.createElement('div'); div.className='ai'; div.textContent='Editing your REAL photo... I go change ONLY: '+userText+' - face go remain same, no cartoon...'; chat.appendChild(div); window.scrollTo(0,document.body.scrollHeight); try{ let r=await fetch('/api/edit-image',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({image:lastUploadedImg, prompt:userText})}); let d=await r.json(); if(d.image){ div.innerHTML='Done ✨ I change ONLY: <b>'+userText+'</b><br>Your original:<br><img src="'+lastUploadedImg+'"><br>Edited - same face, only clothes changed:<br><img src="'+d.image+'">'; } else { div.textContent='Edit fail: '+(d.error||'Unknown'); } }catch(e){ div.textContent='Network error, try again'; } window.scrollTo(0,document.body.scrollHeight); }
-function isImageRequest(t){ t=t.toLowerCase(); return t.includes('generate image')||t.includes('create image')||t.includes('draw')||t.includes('picture of')||t.includes('generate picture')||t.includes('make an image'); }
+
+// SMART IMAGE DETECTION - UNDERSTAND ANY WAY YOU TALK AM
+function isImageRequest(t){
+  let s=t.toLowerCase().trim();
+  if(s==='images' || s==='image' || s==='picture' || s==='pictures' || s==='photo' || s==='photos') return 'ask-topic';
+  if(s.includes('generate') && (s.includes('image')||s.includes('picture')||s.includes('photo'))) return 'make';
+  if(s.includes('create') && (s.includes('image')||s.includes('picture')||s.includes('photo'))) return 'make';
+  if(s.includes('make me') && (s.includes('image')||s.includes('picture')||s.includes('photo'))) return 'make';
+  if(s.includes('draw') || s.includes('paint')) return 'make';
+  if(s.includes('image of') || s.includes('picture of') || s.includes('photo of')) return 'make';
+  if(s.includes('generate an image') || s.includes('generate image') || s.includes('generate a picture')) return 'make';
+  if(waitingForImageTopic && s.length>0 && s.length<50) return 'make-from-topic';
+  return false;
+}
 function isCodeRequest(t){ t=t.toLowerCase(); return t.includes('code')||t.includes('html')||t.includes('python')||t.includes('javascript')||t.includes('website')||t.includes('app code')||t.includes('write a program'); }
 function isPhotoEditRequest(t){ t=t.toLowerCase(); return lastUploadedImg && (t.includes('change')||t.includes('army')||t.includes('uniform')||t.includes('clothes')||t.includes('cartoon')||t.includes('agbada')||t.includes('suit')||t.includes('my photo')||t.includes('my picture')); }
-async function send(){ if(busy) return; let text=input.value.trim(); if(!text) return; let chat=document.getElementById('chat'); if(chipsEl) chipsEl.style.display='none'; popup.style.display='none'; chat.innerHTML+='<div class="me">'+text+'</div>'; history.push({role:'user',content:text}); input.value=''; busy=true; let think=document.createElement('div'); think.className='ai'; think.textContent='Thinking...'; chat.appendChild(think); window.scrollTo(0,document.body.scrollHeight); if(isPhotoEditRequest(text)){ think.textContent='Editing your REAL photo... only: '+text+' - face go remain same, no cartoon...'; try{ let r=await fetch('/api/edit-image',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({image:lastUploadedImg, prompt:text})}); let d=await r.json(); if(d.image) think.innerHTML='Done ✨ I change ONLY: <b>'+text+'</b><br>Same face, no cartoon.<br><img src="'+d.image+'">'; else think.textContent='Edit fail: '+(d.error||'Unknown'); }catch(e){ think.textContent='Network error, try again'; } busy=false; return; } if(isImageRequest(text)){ let prompt = text.replace(/generate image of|generate image|create image of|create image|draw|picture of|make an image of/gi,'').trim() || text; let imgUrl = 'https://image.pollinations.ai/prompt/' + encodeURIComponent(prompt) + '?width=512&height=512&seed=' + Math.floor(Math.random()*9999) + '&nologo=true&model=flux'; think.innerHTML = 'Here is your image ✨<br><img src="'+imgUrl+'" onload="window.scrollTo(0,document.body.scrollHeight)"><br><small>'+prompt+'</small>'; history.push({role:'assistant',content:'Generated image: '+prompt}); busy=false; return; } let langText = settings.lang==='pidgin' ? ' Answer in Nigerian Pidgin only.' : settings.lang==='english' ? ' Answer in clear English only.' : ' Answer in English + Pidgin mix like PizChat.'; let styleText = settings.style==='short' ? ' Keep answer very short.' : settings.style==='detailed' ? ' Give detailed full explanation.' : ' Give normal clear answer.'; let extra = isCodeRequest(text) ? ' You are an expert coder. Give complete working code, with explanation. Put code in code block. Do not cut code.' : ' You can answer any question, write anything, help with anything.'; let finalMsg = text + langText + styleText + extra; try{ let res=await fetch('/api/chat',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({message:finalMsg,history:history})}); let d=await res.json(); let ans=d.answer||'No answer'; ans = ans.replace(/```/g,'<pre>'); think.innerHTML=ans; history.push({role:'assistant',content:ans}); }catch(e){ think.textContent='Network error, try again'; } busy=false; }
+function cleanImagePrompt(text){
+  return text.replace(/generate an image of|generate image of|generate an image|generate image|create an image of|create image of|create image|make me a picture of|make a picture of|draw a picture of|draw|picture of|photo of|image of|generate|create|please|pls/gi,'').trim() || text;
+}
+async function send(){
+  if(busy) return; let text=input.value.trim(); if(!text) return;
+  let chat=document.getElementById('chat'); if(chipsEl) chipsEl.style.display='none'; popup.style.display='none';
+  chat.innerHTML+='<div class="me">'+text+'</div>'; history.push({role:'user',content:text}); input.value=''; busy=true;
+  let think=document.createElement('div'); think.className='ai'; think.textContent='Thinking...'; chat.appendChild(think); window.scrollTo(0,document.body.scrollHeight);
+
+  // 0. IF USER JUST TALK "Images" - ASK TOPIC
+  let imgCheck = isImageRequest(text);
+  if(imgCheck==='ask-topic'){
+    waitingForImageTopic=true;
+    think.innerHTML='Yes! I fit generate image ✨ Wetin you want make I generate? Just type am, e.g. <b>House</b>, <b>Car</b>, <b>Lagos city</b>';
+    busy=false; return;
+  }
+
+  // 1. PHOTO EDIT - REAL PHOTO
+  if(isPhotoEditRequest(text)){
+    waitingForImageTopic=false;
+    think.textContent='Editing your REAL photo... only: '+text+' - face go remain same, no cartoon...';
+    try{ let r=await fetch('/api/edit-image',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({image:lastUploadedImg, prompt:text})}); let d=await r.json(); if(d.image) think.innerHTML='Done ✨ I change ONLY: <b>'+text+'</b><br>Same face, no cartoon.<br><img src="'+d.image+'">'; else think.textContent='Edit fail: '+(d.error||'Unknown'); }catch(e){ think.textContent='Network error, try again'; } busy=false; return;
+  }
+
+  // 2. GENERATE NEW IMAGE - NEVER GO TO TEXT AI, GO DIRECT TO IMAGE GENERATOR
+  if(imgCheck==='make' || imgCheck==='make-from-topic'){
+    waitingForImageTopic=false;
+    let prompt = cleanImagePrompt(text);
+    let imgUrl = 'https://image.pollinations.ai/prompt/' + encodeURIComponent(prompt + ', high quality, beautiful, detailed') + '?width=512&height=512&seed=' + Math.floor(Math.random()*99999) + '&nologo=true&model=flux';
+    think.innerHTML = 'Here is your image of <b>'+prompt+'</b> ✨<br><img src="'+imgUrl+'" onload="window.scrollTo(0,document.body.scrollHeight)"><br><small>Want another? Type "Generate image of car"</small>';
+    history.push({role:'assistant',content:'Generated image: '+prompt});
+    busy=false; return;
+  }
+
+  // 3. IF USER TALK "Can you help me to generate something" - DON'T CONFUSE, ASK CLEAR
+  if(text.toLowerCase().includes('generate something') || text.toLowerCase().includes('help me to generate')){
+    waitingForImageTopic=false;
+    think.innerHTML='Yes, I fit generate anything for you ✨<br>Tap one:<br><div class="transBtns"><button onclick="quick(\'Generate an image of a beautiful house\')">🏠 House Image</button><button onclick="quick(\'Write a short story for me\')">✍️ Story</button><button onclick="quick(\'Write HTML code for a login page\')">💻 Code</button></div>Or just type: "Generate image of house"';
+    busy=false; return;
+  }
+
+  // 4. TEXT / CODE - NEVER SAY "I CANT HELP"
+  waitingForImageTopic=false;
+  let langText = settings.lang==='pidgin' ? ' Answer in Nigerian Pidgin only.' : settings.lang==='english' ? ' Answer in clear English only.' : ' Answer in English + Pidgin mix like PizChat.';
+  let styleText = settings.style==='short' ? ' Keep answer very short.' : settings.style==='detailed' ? ' Give detailed full explanation.' : ' Give normal clear answer.';
+  let extra = isCodeRequest(text) ? ' You are an expert coder. Give complete working code, with explanation. Put code in code block. Do not cut code.' : ' You can answer any question, write anything, help with anything. Never say you cannot help.';
+  let finalMsg = text + langText + styleText + extra;
+  try{ let res=await fetch('/api/chat',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({message:finalMsg,history:history})}); let d=await res.json(); let ans=d.answer||'No answer'; ans = ans.replace(/```/g,'<pre>'); think.innerHTML=ans; history.push({role:'assistant',content:ans}); }catch(e){ think.textContent='Network error, try again'; } busy=false;
+}
 input.addEventListener('keydown',e=>{ if(e.key==='Enter') send(); });
 document.addEventListener('click',e=>{ if(!e.target.closest('#sidePopup') && !e.target.closest('.icon')){ popup.style.display='none'; } });
 </script>
