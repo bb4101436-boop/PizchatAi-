@@ -47,7 +47,7 @@ let r=await fetch('/api/chat',{method:'POST',headers:{'Content-Type':'applicatio
 let d=await r.json();
 let ans=d.answer||d.reply||d.text||d.response||(d.choices&&d.choices[0].message.content)||'No answer';
 document.getElementById('tmp').textContent=ans;
-}catch(e){document.getElementById('tmp').textContent='Network error, try again';}
+}catch(e){document.getElementById('tmp').textContent='Real error: '+e.message;}
 window.scrollTo(0,document.body.scrollHeight);
 }
 function startMic(){alert('Mic: Hold to talk - coming soon');}
