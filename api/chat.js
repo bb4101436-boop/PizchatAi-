@@ -5,19 +5,31 @@ export default async function handler(req, res) {
   if (req.method === 'OPTIONS') return res.status(200).end();
   try {
     let body = req.body;
-    if (typeof body === 'string') { try{body=JSON.parse(body)}catch(e){body={}} }
-    if (!body) body = {};
-    const q = body.message || body.prompt || '';
+    if (typeof body === 'string') {
+      try { body = JSON.parse(body); } catch (e) { body = {}; }
+    }
+    const q = (body && (body.message || body.prompt)) || '';
     if (!q) return res.status(200).json({ answer: 'Send me a message' });
-    if (!process.env.GROQ_API_KEY) return res.status(200).json({ answer: 'ERROR: GROQ_API_KEY missing in Vercel Settings' });
+    if (!process.env.GROQ_API_KEY) return res.status(200).json({ answer: 'ERROR: GROQ_API_KEY missing in Vercel' });
+
+    const payload = {
+      model: 'openai/gpt-oss-20b',
+      messages: [
+        { role: 'system', content: 'Answer in plain simple text. No markdown, no tables, no LaTeX. Use short clear sentences.' },
+        { role: 'user', content: q }
+      ],
+      max_tokens: 500
+    };
 
     const r = await fetch('https://api.groq.com/openai/v1/chat/completions', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + process.env.GROQ_API_KEY },
-      messages: [{ role: 'system', content: 'Answer in plain simple text. No markdown, no **, no tables, no LaTeX. Use short clear sentences.' }, { role: 'user', content: q }]
+      body: JSON.stringify(payload)
     });
-    const data = await r.json();
-    if (!r.ok) return res.status(200).json({ answer: 'Groq error: ' + (data.error && data.error.message ? data.error.message : 'check key') });
+    const text = await r.text();
+    let data = {};
+    try { data = JSON.parse(text); } catch (e) { return res.status(200).json({ answer: 'Groq returned non-JSON: ' + text.slice(0, 200) }); }
+    if (!r.ok) return res.status(200).json({ answer: 'Groq error: ' + (data.error ? data.error.message : 'check key') });
     const ans = data.choices && data.choices[0] && data.choices[0].message ? data.choices[0].message.content : 'No answer';
     return res.status(200).json({ answer: ans });
   } catch (e) {
