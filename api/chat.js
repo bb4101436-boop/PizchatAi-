@@ -11,17 +11,15 @@ export default async function handler(req, res) {
     const q = (body && (body.message || body.prompt)) || '';
     if (!q) return res.status(200).json({ answer: 'Send me a message' });
     if (!process.env.GROQ_API_KEY) return res.status(200).json({ answer: 'ERROR: GROQ_API_KEY missing in Vercel' });
-
     const payload = {
-      model: model: 'openai/gpt-oss-20b',
+      model: 'openai/gpt-oss-20b',
       temperature: 0.7,
       messages: [
-        { role: 'system', content: 'You are PizChat AI, a smart friendly Nigerian AI assistant. Never say you are ChatGPT or OpenAI. You understand English and Nigerian Pidgin like Hi, How far nah, Wetin dey, Abeg. If user greets you, greet back warmly and ask how you can help, never say you are not sure what they are asking. Answer in plain simple text, short and clear, like a smart friend. No markdown, no **, no tables with |, no LaTeX. Be helpful, fast, and human.' },
+        { role: 'system', content: 'You are PizChat AI, a smart friendly Nigerian AI assistant. Never say you are ChatGPT or OpenAI. You understand English and Nigerian Pidgin like Hi, How far nah, Wetin dey. If user greets you, greet back warmly and ask how you can help. Answer in plain simple text, short and clear, like a smart friend. No markdown, no tables, no LaTeX.' },
         { role: 'user', content: q }
       ],
       max_tokens: 600
     };
-
     const r = await fetch('https://api.groq.com/openai/v1/chat/completions', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + process.env.GROQ_API_KEY },
