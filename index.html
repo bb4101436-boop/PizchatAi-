@@ -1,21 +1,19 @@
 <!DOCTYPE html>
-<html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>PizChat AI - Built by PizChat</title>
 <meta name="theme-color" content="#000000">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<meta name="apple-mobile-web-app-title" content="PizChat">
 <link rel="icon" href="data:image/svg+xml,[STRIPPED]">
 <style>
 body{background:#000;color:#fff;font-family:sans-serif;margin:0;padding:10px}
 body.light{background:#f5f5f5;color:#000}
 body.light .ai{background:#e5e5e5;color:#000}
 body.light #bar{background:#f5f5f5}
-body.light input, body.light .icon, body.light #top button, body.light #chips button{background:#fff;color:#000;border:1px solid #ddd}
+body.light input,body.light .icon,body.light #top button,body.light #chips button{background:#fff;color:#000;border:1px solid #ddd}
 #offlineBar{display:none;background:#ff3b30;color:#fff;text-align:center;padding:10px;font-weight:bold;position:fixed;top:0;left:0;right:0;z-index:999}
 #top{display:flex;justify-content:space-between;align-items:center;gap:6px}
-#top button{background:#222;color:#fff;border:none;padding:8px 14px;border-radius:20px}
+#top button{background:#222;color:#fff;border:none;padding:8px 14px;border-radius:20px;cursor:pointer}
 #top .pencil{font-size:18px;width:42px;height:42px;border-radius:50%;padding:0}
 #installBtn{display:none;background:#a3e635!important;color:#000!important;font-weight:bold}
 #chat{display:flex;flex-direction:column;gap:10px;padding-bottom:120px}
@@ -24,57 +22,56 @@ body.light input, body.light .icon, body.light #top button, body.light #chips bu
 .ai{background:#222;padding:10px 14px;border-radius:18px;max-width:85%}
 .ai pre{background:#000;color:#a3e635;padding:10px;border-radius:10px;overflow-x:auto;white-space:pre-wrap}
 #chips{display:flex;gap:8px;flex-wrap:wrap;margin:10px 0}
-#chips button{background:#222;color:#fff;border:1px solid #444;padding:8px 12px;border-radius:20px;font-size:13px}
+#chips button{background:#222;color:#fff;border:1px solid #444;padding:8px 12px;border-radius:20px;font-size:13px;cursor:pointer}
 #sidePopup{display:none;position:fixed;left:10px;bottom:72px;background:#111;border:1px solid #444;border-radius:16px;padding:10px;flex-direction:column;gap:8px;z-index:99;max-width:230px}
-#sidePopup button{background:#222;color:#fff;border:1px solid #444;padding:10px;border-radius:12px;text-align:left;font-size:14px}
+#sidePopup button{background:#222;color:#fff;border:1px solid #444;padding:10px;border-radius:12px;text-align:left;font-size:14px;cursor:pointer}
 .transBtns{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
-.transBtns button{background:#a3e635;color:#000;border:none;padding:8px 10px;border-radius:20px;font-size:12px;font-weight:bold}
+.transBtns button{background:#a3e635;color:#000;border:none;padding:8px 10px;border-radius:20px;font-size:12px;font-weight:bold;cursor:pointer}
 #settingsPanel{display:none;position:fixed;left:0;top:0;bottom:0;width:280px;max-width:85%;background:#111;color:#fff;z-index:200;padding:16px;overflow-y:auto;border-right:1px solid #444}
 body.light #settingsPanel{background:#fff;color:#000}
-#settingsPanel h3{margin-top:0}
 .setRow{margin:14px 0}
 .setRow label{font-size:13px;color:#aaa;display:block;margin-bottom:6px}
 .setRow select{width:100%;padding:10px;border-radius:10px;background:#222;color:#fff;border:1px solid #444}
-.setRow button{width:100%;padding:11px;border-radius:10px;border:none;background:#a3e635;color:#000;font-weight:bold;margin-top:8px}
+.setRow button{width:100%;padding:11px;border-radius:10px;border:none;background:#a3e635;color:#000;font-weight:bold;margin-top:8px;cursor:pointer}
 #overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:150}
 #bar{position:fixed;bottom:0;left:0;right:0;display:flex;gap:8px;padding:10px;background:#000;align-items:center}
 input{flex:1;padding:12px;border-radius:20px;border:none;background:#222;color:#fff}
-.icon{width:42px;height:42px;border-radius:50%;border:none;background:#222;color:#fff;font-size:18px}
+.icon{width:42px;height:42px;border-radius:50%;border:none;background:#222;color:#fff;font-size:18px;cursor:pointer}
 #send{background:#a3e635;color:#000}
 </style></head>
 <body>
-<div id="offlineBar">⚠️ No Internet - You need data to use PizChat AI. Turn on your data.</div>
-<div id="top"><button class="pencil" onclick="openSettings()">✏️</button><h2 style="margin:0">PizChat AI</h2><button id="installBtn" onclick="installApp()">⬇️ Install App</button><button onclick="newChat()">+ New Chat</button></div>
+<div id="offlineBar">No Internet - You need data to use PizChat AI</div>
+<div id="top"><button class="pencil" onclick="openSettings()">✏️</button><h2 style="margin:0">PizChat AI</h2><button id="installBtn" onclick="installApp()">Install App</button><button onclick="newChat()">+ New Chat</button></div>
 <div id="chat">
 <div id="chips">
-<button onclick="quick('Write a short story for me')">✍️ Write a story</button>
-<button onclick="quick('Explain like I am 5')">🧒 Explain like I am 5</button>
-<button onclick="quick('Give me a business idea in Nigeria')">💡 Business idea</button>
-<button onclick="quick('Help me with my homework')">📚 Homework</button>
+<button onclick="quick('Write a short story for me')">Write a story</button>
+<button onclick="quick('Explain like I am 5')">Explain like I am 5</button>
+<button onclick="quick('Give me a business idea in Nigeria')">Business idea</button>
+<button onclick="quick('Help me with my homework')">Homework</button>
 </div>
-<div class="ai">Hello ✨ I be PizChat AI, built by PizChat. How can I help today? Ask question, ask for code, generate image, or upload your photo to edit only what you ask.</div>
+<div class="ai">Hello. I be PizChat AI, built by PizChat. How can I help today? Ask question, ask for code, generate image, or upload your photo to edit only what you ask.</div>
 </div>
 <div id="sidePopup">
-<button onclick="document.getElementById('uploadInput').click()">📸 Upload Photo - Edit Only What You Ask</button>
-<button onclick="quick('Write a short story for me')">✍️ Write a story</button>
-<button onclick="quick('Explain like I am 5')">🧒 Explain like I am 5</button>
-<button onclick="quick('Give me a business idea in Nigeria')">💡 Business idea</button>
-<button onclick="quick('Help me with my homework')">📚 Homework</button>
-<button onclick="quick('Generate an image of a beautiful Lagos city at sunset')">🎨 Generate Image</button>
-<button onclick="quick('Write HTML code for a login page')">💻 Write Code</button>
-<button onclick="togglePopup()">✖️ Close</button>
+<button onclick="openUpload()">Upload Photo - Edit Only What You Ask</button>
+<button onclick="quick('Write a short story for me')">Write a story</button>
+<button onclick="quick('Explain like I am 5')">Explain like I am 5</button>
+<button onclick="quick('Give me a business idea in Nigeria')">Business idea</button>
+<button onclick="quick('Help me with my homework')">Homework</button>
+<button onclick="quick('Generate an image of a beautiful Lagos city at sunset')">Generate Image</button>
+<button onclick="quick('Write HTML code for a login page')">Write Code</button>
+<button onclick="togglePopup()">Close</button>
 </div>
-<input type="file" id="uploadInput" accept="image/*" hidden onchange="handleUpload(event)">
+<input type="file" id="uploadInput" accept="image/*" hidden>
 <div id="overlay" onclick="closeSettings()"></div>
 <div id="settingsPanel">
-<h3>✏️ Settings</h3>
-<p style="font-size:13px;color:#aaa">PizChat AI • Built by PizChat • Online Only - Needs Data</p>
+<h3>Settings</h3>
+<p style="font-size:13px;color:#aaa">PizChat AI - Built by PizChat - Online Only</p>
 <div class="setRow"><label>Language</label><select id="setLang" onchange="saveSettings()"><option value="mix">English + Pidgin Mix</option><option value="english">English Only</option><option value="pidgin">Pidgin Only</option></select></div>
-<div class="setRow"><label>Answer Style</label><select id="setStyle" onchange="saveSettings()"><option value="normal">Normal</option><option value="short">Short & Sharp</option><option value="detailed">Detailed</option></select></div>
+<div class="setRow"><label>Answer Style</label><select id="setStyle" onchange="saveSettings()"><option value="normal">Normal</option><option value="short">Short</option><option value="detailed">Detailed</option></select></div>
 <div class="setRow"><label>Theme</label><select id="setTheme" onchange="saveSettings()"><option value="dark">Dark</option><option value="light">Light</option></select></div>
 <div class="setRow"><label>Font Size</label><select id="setFont" onchange="saveSettings()"><option value="15">Normal</option><option value="17">Big</option><option value="13">Small</option></select></div>
-<div class="setRow"><button onclick="installApp()">⬇️ Install PizChat App</button><button onclick="clearChat()">🗑️ Clear Chat</button><button onclick="newChat();closeSettings()">✨ Start New Chat</button><button onclick="closeSettings()" style="background:#222;color:#fff">Close Settings</button></div>
-<p style="font-size:12px;color:#888;text-align:center">PizChat AI • Version 1.0 • Built by PizChat • Needs Internet</p>
+<div class="setRow"><button onclick="installApp()">Install PizChat App</button><button onclick="clearChat()">Clear Chat</button><button onclick="doNewChatFromSettings()">Start New Chat</button><button onclick="closeSettings()" style="background:#222;color:#fff">Close Settings</button></div>
+<p style="font-size:12px;color:#888;text-align:center">PizChat AI - Version 1.0 - Built by PizChat</p>
 </div>
 <div id="bar">
 <button class="icon" onclick="togglePopup()">+</button>
@@ -83,59 +80,159 @@ input{flex:1;padding:12px;border-radius:20px;border:none;background:#222;color:#
 <button class="icon" id="send" onclick="send()">➤</button>
 </div>
 <script>
-const manifestData = {name:"PizChat AI", short_name:"PizChat", description:"PizChat AI - Built by PizChat. Ask, Code, Generate Image, Edit Photo.", start_url:"/", display:"standalone", background_color:"#000000", theme_color:"#000000", orientation:"portrait", icons:[{src:"data:image/svg+xml,[STRIPPED]", sizes:"192x192", type:"image/svg+xml", purpose:"any"}, {src:"data:image/svg+xml,[STRIPPED]", sizes:"512x512", type:"image/svg+xml", purpose:"any"}]};
-const manifestBlob = new Blob([JSON.stringify(manifestData)], {type:'application/json'});
-const manifestURL = URL.createObjectURL(manifestBlob);
-const link = document.createElement('link'); link.rel='manifest'; link.href=manifestURL; document.head.appendChild(link);
-if('serviceWorker' in navigator){ navigator.serviceWorker.getRegistrations().then(regs=>{ regs.forEach(r=>r.unregister()); }); if('caches' in window){ caches.keys().then(keys=>keys.forEach(k=>caches.delete(k))); } }
-function checkOnline(){ let bar=document.getElementById('offlineBar'); if(!navigator.onLine){ bar.style.display='block'; return false; } bar.style.display='none'; return true; }
-window.addEventListener('online', checkOnline); window.addEventListener('offline', checkOnline); checkOnline();
-let deferredPrompt=null;
-window.addEventListener('beforeinstallprompt', e=>{ e.preventDefault(); deferredPrompt=e; document.getElementById('installBtn').style.display='block'; });
-function installApp(){ if(!checkOnline()){ alert('You need data to install and use PizChat'); return; } if(deferredPrompt){ deferredPrompt.prompt(); deferredPrompt.userChoice.then(()=>{ deferredPrompt=null; document.getElementById('installBtn').style.display='none'; }); } else { alert('To install:\n\nAndroid Chrome: Tap 3 dots for top right > Add to Home screen / Install app\n\niPhone Safari: Tap Share button > Add to Home Screen'); } }
-let history=[]; let busy=false; let chipsEl=document.getElementById('chips'); let popup=document.getElementById('sidePopup'); let input=document.getElementById('q'); let lastUploadedImg=''; let waitingForImageTopic=false;
-let settings = JSON.parse(localStorage.getItem('pizchat_settings')||'{"lang":"mix","style":"normal","theme":"dark","font":"15"}');
-document.getElementById('setLang').value=settings.lang; document.getElementById('setStyle').value=settings.style; document.getElementById('setTheme').value=settings.theme; document.getElementById('setFont').value=settings.font;
+var historyArr = [];
+var busy = false;
+var lastUploadedImg = '';
+var waitingForImageTopic = false;
+var deferredPrompt = null;
+var chipsEl = document.getElementById('chips');
+var popup = document.getElementById('sidePopup');
+var input = document.getElementById('q');
+var settings = {lang:'mix', style:'normal', theme:'dark', font:'15'};
+try{ var saved = JSON.parse(localStorage.getItem('pizchat_settings')||'{}'); if(saved.lang) settings = saved; }catch(e){}
+document.getElementById('setLang').value = settings.lang;
+document.getElementById('setStyle').value = settings.style;
+document.getElementById('setTheme').value = settings.theme;
+document.getElementById('setFont').value = settings.font;
 applySettings();
-function applySettings(){ document.body.classList.toggle('light', settings.theme==='light'); document.body.style.fontSize=settings.font+'px'; }
-function saveSettings(){ settings={lang:document.getElementById('setLang').value, style:document.getElementById('setStyle').value, theme:document.getElementById('setTheme').value, font:document.getElementById('setFont').value}; localStorage.setItem('pizchat_settings', JSON.stringify(settings)); applySettings(); }
+
+function checkOnline(){
+  var bar = document.getElementById('offlineBar');
+  if(!navigator.onLine){ bar.style.display='block'; return false; }
+  bar.style.display='none'; return true;
+}
+window.addEventListener('online', checkOnline);
+window.addEventListener('offline', checkOnline);
+checkOnline();
+
+window.addEventListener('beforeinstallprompt', function(e){ e.preventDefault(); deferredPrompt=e; document.getElementById('installBtn').style.display='block'; });
+function installApp(){
+  if(deferredPrompt){ deferredPrompt.prompt(); deferredPrompt.userChoice.then(function(){ deferredPrompt=null; document.getElementById('installBtn').style.display='none'; }); }
+  else { alert('To install: Android Chrome - Tap 3 dots > Add to Home screen / Install app. iPhone Safari - Share > Add to Home Screen'); }
+}
+try{
+  var manifestData = {name:"PizChat AI", short_name:"PizChat", start_url:"/", display:"standalone", background_color:"#000000", theme_color:"#000000"};
+  var blob = new Blob([JSON.stringify(manifestData)], {type:'application/json'});
+  var url = URL.createObjectURL(blob);
+  var lk = document.createElement('link'); lk.rel='manifest'; lk.href=url; document.head.appendChild(lk);
+}catch(e){}
+
+function applySettings(){ document.body.classList.toggle('light', settings.theme==='light'); document.body.style.fontSize = settings.font+'px'; }
+function saveSettings(){
+  settings = {lang:document.getElementById('setLang').value, style:document.getElementById('setStyle').value, theme:document.getElementById('setTheme').value, font:document.getElementById('setFont').value};
+  try{ localStorage.setItem('pizchat_settings', JSON.stringify(settings)); }catch(e){}
+  applySettings();
+}
 function openSettings(){ document.getElementById('settingsPanel').style.display='block'; document.getElementById('overlay').style.display='block'; }
 function closeSettings(){ document.getElementById('settingsPanel').style.display='none'; document.getElementById('overlay').style.display='none'; }
-function clearChat(){ history=[]; waitingForImageTopic=false; document.getElementById('chat').innerHTML='<div class="ai">Chat cleared ✨ Wetin you wan talk about?</div>'; closeSettings(); }
-function togglePopup(){ popup.style.display = popup.style.display==='flex' ? 'none' : 'flex'; }
-function newChat(){ history=[]; lastUploadedImg=''; waitingForImageTopic=false; document.getElementById('chat').innerHTML='<div id="chips">'+chipsEl.innerHTML+'</div><div class="ai">Fresh chat ✨ I be PizChat AI, built by PizChat. Wetin you wan talk about?</div>'; chipsEl=document.getElementById('chips'); chipsEl.style.display='flex'; popup.style.display='none'; closeSettings(); }
+function clearChat(){ historyArr=[]; waitingForImageTopic=false; document.getElementById('chat').innerHTML='<div class="ai">Chat cleared. Wetin you wan talk about?</div>'; closeSettings(); }
+function togglePopup(){ if(popup.style.display==='flex'){ popup.style.display='none'; } else { popup.style.display='flex'; } }
+function newChat(){ historyArr=[]; lastUploadedImg=''; waitingForImageTopic=false; document.getElementById('chat').innerHTML='<div id="chips"><button onclick="quick(\'Write a short story for me\')">Write a story</button><button onclick="quick(\'Explain like I am 5\')">Explain like I am 5</button><button onclick="quick(\'Give me a business idea in Nigeria\')">Business idea</button><button onclick="quick(\'Help me with my homework\')">Homework</button></div><div class="ai">Fresh chat. I be PizChat AI, built by PizChat. Wetin you wan talk about?</div>'; chipsEl=document.getElementById('chips'); popup.style.display='none'; closeSettings(); }
+function doNewChatFromSettings(){ newChat(); }
 function quick(t){ popup.style.display='none'; document.getElementById('q').value=t; send(); }
-input.addEventListener('input', ()=>{ if(input.value.trim().length>0){ if(chipsEl) chipsEl.style.display='none'; popup.style.display='none'; } else { if(history.length===0 && chipsEl) chipsEl.style.display='flex'; } });
-function mic(){ if(!checkOnline()){ alert('You need data to use mic'); return; } if(!('webkitSpeechRecognition' in window || 'SpeechRecognition' in window)){ alert('Mic no work for this browser, use Chrome'); return; } let Rec = window.SpeechRecognition || window.webkitSpeechRecognition; let r = new Rec(); r.lang='en-NG'; r.start(); r.onresult = e=>{ document.getElementById('q').value = e.results[0][0].transcript; send(); }; }
-function handleUpload(e){ if(!checkOnline()){ alert('You need data to upload and edit photo'); return; } let file=e.target.files[0]; if(!file) return; popup.style.display='none'; if(chipsEl) chipsEl.style.display='none'; let reader=new FileReader(); reader.onload=function(ev){ lastUploadedImg=ev.target.result; let chat=document.getElementById('chat'); chat.innerHTML+='<div class="me">My photo 📸<img src="'+lastUploadedImg+'"></div>'; let aiDiv=document.createElement('div'); aiDiv.className='ai'; aiDiv.innerHTML='I don see your photo ✨ Tell me EXACTLY wetin to change. I go change ONLY that one, your face go remain same.<div class="transBtns"><button onclick="doEdit(\'only change my clothes to army uniform\')">🪖 Army Uniform</button><button onclick="doEdit(\'only change my clothes to elegant suit\')">👔 Suit Only</button><button onclick="doEdit(\'only change my clothes to Agbada\')">👘 Agbada Only</button><button onclick="doEdit(\'make me cartoon, Pixar style\')">🎨 Cartoon</button></div>'; chat.appendChild(aiDiv); window.scrollTo(0,document.body.scrollHeight); }; reader.readAsDataURL(file); e.target.value=''; }
-async function doEdit(userText){ if(!checkOnline()){ alert('You need data to edit photo'); return; } if(!lastUploadedImg){ alert('Upload photo first'); return; } let chat=document.getElementById('chat'); let div=document.createElement('div'); div.className='ai'; div.textContent='Editing your REAL photo... I go change ONLY: '+userText+' - face go remain same, no cartoon...'; chat.appendChild(div); window.scrollTo(0,document.body.scrollHeight); try{ let r=await fetch('/api/edit-image',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({image:lastUploadedImg, prompt:userText})}); let d=await r.json(); if(d.image){ div.innerHTML='Done ✨ I change ONLY: <b>'+userText+'</b><br>Your original:<br><img src="'+lastUploadedImg+'"><br>Edited - same face, only clothes changed:<br><img src="'+d.image+'">'; } else { div.textContent='Edit fail: '+(d.error||'Unknown'); } }catch(e){ div.textContent='No Internet - You need data to edit photo'; } window.scrollTo(0,document.body.scrollHeight); }
-function isImageRequest(t){ let s=t.toLowerCase().trim(); if(s==='images' || s==='image' || s==='picture' || s==='pictures' || s==='photo' || s==='photos') return 'ask-topic'; let isNotImage = s.includes('code') || s.includes('story') || s.includes('essay') || s.includes('letter') || s.includes('business idea') || s.includes('homework') || s.includes('joke') || s.includes('password'); if(isNotImage) return false; if(s.startsWith('generate') || s.startsWith('create') || s.startsWith('draw') || s.startsWith('make') || s.startsWith('paint') || s.startsWith('show me')) return 'make'; if(s.includes('generate an image') || s.includes('generate image') || s.includes('image of') || s.includes('picture of') || s.includes('photo of')) return 'make'; if(s.includes('generate') && (s.includes('image')||s.includes('picture')||s.includes('photo')||s.includes('car')||s.includes('house')||s.includes('dog')||s.includes('cat'))) return 'make'; if(waitingForImageTopic && s.length>0 && s.length<60) return 'make-from-topic'; return false; }
-function isCodeRequest(t){ t=t.toLowerCase(); return t.includes('code')||t.includes('html')||t.includes('python')||t.includes('javascript')||t.includes('website')||t.includes('app code')||t.includes('write a program'); }
-function isPhotoEditRequest(t){ t=t.toLowerCase(); return lastUploadedImg && (t.includes('change')||t.includes('army')||t.includes('uniform')||t.includes('clothes')||t.includes('cartoon')||t.includes('agbada')||t.includes('suit')||t.includes('my photo')||t.includes('my picture')); }
+function openUpload(){ popup.style.display='none'; document.getElementById('uploadInput').click(); }
+
+if(input){
+  input.addEventListener('input', function(){
+    if(input.value.trim().length>0){ if(chipsEl) chipsEl.style.display='none'; popup.style.display='none'; }
+    else { if(historyArr.length===0 && chipsEl) chipsEl.style.display='flex'; }
+  });
+  input.addEventListener('keydown', function(e){ if(e.key==='Enter') send(); });
+}
+document.getElementById('uploadInput').addEventListener('change', function(e){ handleUpload(e); });
+
+function mic(){
+  if(!checkOnline()){ alert('You need data to use mic'); return; }
+  if(!('webkitSpeechRecognition' in window || 'SpeechRecognition' in window)){ alert('Mic no work for this browser, use Chrome'); return; }
+  var Rec = window.SpeechRecognition || window.webkitSpeechRecognition;
+  var r = new Rec(); r.lang='en-NG'; r.start();
+  r.onresult = function(ev){ document.getElementById('q').value = ev.results[0][0].transcript; send(); };
+}
+function handleUpload(e){
+  if(!checkOnline()){ alert('You need data to upload'); return; }
+  var file = e.target.files[0]; if(!file) return;
+  popup.style.display='none'; if(chipsEl) chipsEl.style.display='none';
+  var reader = new FileReader();
+  reader.onload = function(ev){
+    lastUploadedImg = ev.target.result;
+    var chat = document.getElementById('chat');
+    chat.innerHTML += '<div class="me">My photo <img src="'+lastUploadedImg+'"></div>';
+    var aiDiv = document.createElement('div'); aiDiv.className='ai';
+    aiDiv.innerHTML = 'I don see your photo. Tell me EXACTLY wetin to change. I go change ONLY that one, your face go remain same.<div class="transBtns"><button onclick="doEdit(\'only change my clothes to army uniform\')">Army Uniform</button><button onclick="doEdit(\'only change my clothes to elegant suit\')">Suit Only</button><button onclick="doEdit(\'only change my clothes to Agbada\')">Agbada Only</button><button onclick="doEdit(\'make me cartoon, Pixar style\')">Cartoon</button></div>';
+    chat.appendChild(aiDiv); window.scrollTo(0,document.body.scrollHeight);
+  };
+  reader.readAsDataURL(file); e.target.value='';
+}
+async function doEdit(userText){
+  if(!checkOnline()){ alert('You need data'); return; }
+  if(!lastUploadedImg){ alert('Upload photo first'); return; }
+  var chat = document.getElementById('chat');
+  var div = document.createElement('div'); div.className='ai'; div.textContent='Editing your REAL photo... Only: '+userText+' - face go remain same...';
+  chat.appendChild(div); window.scrollTo(0,document.body.scrollHeight);
+  try{
+    var r = await fetch('/api/edit-image',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({image:lastUploadedImg, prompt:userText})});
+    var d = await r.json();
+    if(d.image){ div.innerHTML='Done. I change ONLY: <b>'+userText+'</b><br><img src="'+d.image+'">'; }
+    else { div.textContent='Edit fail: '+(d.error||'Unknown'); }
+  }catch(e){ div.textContent='No Internet - You need data'; }
+}
+function isImageRequest(t){
+  var s = t.toLowerCase().trim();
+  if(s==='images' || s==='image' || s==='picture' || s==='pictures' || s==='photo' || s==='photos') return 'ask-topic';
+  if(s.indexOf('code')!==-1 || s.indexOf('story')!==-1 || s.indexOf('essay')!==-1 || s.indexOf('homework')!==-1) return false;
+  if(s.indexOf('generate')===0 || s.indexOf('create')===0 || s.indexOf('draw')===0 || s.indexOf('make')===0 || s.indexOf('paint')===0 || s.indexOf('show me')===0) return 'make';
+  if(s.indexOf('image of')!==-1 || s.indexOf('picture of')!==-1 || s.indexOf('photo of')!==-1) return 'make';
+  if(waitingForImageTopic && s.length>0 && s.length<60) return 'make-from-topic';
+  return false;
+}
+function isCodeRequest(t){ t=t.toLowerCase(); return t.indexOf('code')!==-1 || t.indexOf('html')!==-1 || t.indexOf('python')!==-1 || t.indexOf('javascript')!==-1 || t.indexOf('website')!==-1; }
+function isPhotoEditRequest(t){ t=t.toLowerCase(); return lastUploadedImg && (t.indexOf('change')!==-1 || t.indexOf('army')!==-1 || t.indexOf('uniform')!==-1 || t.indexOf('clothes')!==-1 || t.indexOf('cartoon')!==-1 || t.indexOf('agbada')!==-1 || t.indexOf('suit')!==-1 || t.indexOf('my photo')!==-1); }
 function cleanImagePrompt(text){ return text.replace(/generate an image of|generate image of|generate an image|generate image|generate a picture of|generate|create an image of|create image of|create image|create|make me a picture of|make a picture of|make me|make|draw a picture of|draw|show me a picture of|show me|picture of|photo of|image of|please|pls/gi,'').trim() || text; }
-function fixIdentity(ans){ return ans.replace(/trained by OpenAI/gi,'built by PizChat').replace(/created by OpenAI/gi,'built by PizChat').replace(/built by OpenAI/gi,'built by PizChat').replace(/made by OpenAI/gi,'built by PizChat').replace(/I am ChatGPT/gi,'I am PizChat AI').replace(/I\'m ChatGPT/gi,'I am PizChat AI').replace(/OpenAI\'s/gi,'PizChat\'s'); }
+function fixIdentity(ans){ return ans.replace(/trained by OpenAI/gi,'built by PizChat').replace(/I am ChatGPT/gi,'I am PizChat AI'); }
+
 async function send(){
   if(!checkOnline()){ alert('You need data to use PizChat AI'); return; }
-  if(busy) return; let text=input.value.trim(); if(!text) return;
-  // Direct identity questions - answer immediately, no need backend wahala
-  let low = text.toLowerCase();
-  if(low.includes('who built you') || low.includes('who made you') || low.includes('who created you') || low.includes('who trained you') || low.includes('who is your creator') || low.includes('are you really smart')){
-    let chat=document.getElementById('chat'); if(chipsEl) chipsEl.style.display='none'; popup.style.display='none'; chat.innerHTML+='<div class="me">'+text+'</div>';
-    let div=document.createElement('div'); div.className='ai';
-    if(low.includes('who built') || low.includes('who made') || low.includes('who created') || low.includes('who trained') || low.includes('creator')){
-      div.innerHTML='I be <b>PizChat AI</b>, and na <b>PizChat</b> build me ✨ PizChat na Nigerian developer wey build me to help you with anything - question, code, image, photo edit. I no be OpenAI, I no be ChatGPT. I be PizChat own.';
-    } else {
-      div.innerHTML='Yes, I really smart ✨ I be PizChat AI, built by PizChat. I fit answer question, write code, generate image, help with homework, business idea, anything you want. Try me.';
-    }
-    chat.appendChild(div); input.value=''; window.scrollTo(0,document.body.scrollHeight); return;
+  if(busy) return;
+  var text = input.value.trim(); if(!text) return;
+  var low = text.toLowerCase();
+  if(low.indexOf('who built you')!==-1 || low.indexOf('who made you')!==-1 || low.indexOf('who created you')!==-1 || low.indexOf('who trained you')!==-1){
+    var chat0 = document.getElementById('chat'); if(chipsEl) chipsEl.style.display='none'; popup.style.display='none';
+    chat0.innerHTML += '<div class="me">'+text+'</div>';
+    var div0 = document.createElement('div'); div0.className='ai'; div0.innerHTML='I be <b>PizChat AI</b>, and na <b>PizChat</b> build me. I no be OpenAI, I no be ChatGPT. I be PizChat own.';
+    chat0.appendChild(div0); input.value=''; window.scrollTo(0,document.body.scrollHeight); return;
   }
-  let chat=document.getElementById('chat'); if(chipsEl) chipsEl.style.display='none'; popup.style.display='none';
-  chat.innerHTML+='<div class="me">'+text+'</div>'; history.push({role:'user',content:text}); input.value=''; busy=true;
-  let think=document.createElement('div'); think.className='ai'; think.textContent='Thinking...'; chat.appendChild(think); window.scrollTo(0,document.body.scrollHeight);
-  let imgCheck = isImageRequest(text);
-  if(imgCheck==='ask-topic'){ waitingForImageTopic=true; think.innerHTML='Yes! I fit generate image ✨ Wetin you want make I generate? Just type am, e.g. <b>Blue Car</b>, <b>House</b>, <b>Lagos city</b>'; busy=false; return; }
-  if(isPhotoEditRequest(text)){ waitingForImageTopic=false; think.textContent='Editing your REAL photo... only: '+text+' - face go remain same, no cartoon...'; try{ let r=await fetch('/api/edit-image',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({image:lastUploadedImg, prompt:text})}); let d=await r.json(); if(d.image) think.innerHTML='Done ✨ I change ONLY: <b>'+text+'</b><br>Same face, no cartoon.<br><img src="'+d.image+'">'; else think.textContent='Edit fail: '+(d.error||'Unknown'); }catch(e){ think.textContent='No Internet - You need data'; } busy=false; return; }
-  if(imgCheck==='make' || imgCheck==='make-from-topic'){ waitingForImageTopic=false; let prompt = cleanImagePrompt(text); let imgUrl = 'https://image.pollinations.ai/prompt/' + encodeURIComponent(prompt + ', high quality, beautiful, detailed, realistic photo') + '?width=512&height=512&seed=' + Math.floor(Math.random()*99999) + '&nologo=true&model=flux'; think.innerHTML = 'Here is your image of <b>'+prompt+'</b> ✨<br><img src="'+imgUrl+'" onload="window.scrollTo(0,document.body.scrollHeight)"><br><small>Want another? Type "Generate blue car" or "Generate house"</small>'; history.push({role:'assistant',content:'Generated image: '+prompt}); busy=false; return; }
-  if(text.toLowerCase().includes('generate something') || text.toLowerCase().includes('help me to generate')){ waitingForImageTopic=false; think.innerHTML='Yes, I fit generate anything for you ✨<br>Tap one:<br><div class="transBtns"><button onclick="quick(\'Generate an image of a beautiful house\')">🏠 House Image</button><button onclick="quick(\'Generate blue car\')">🚗 Blue Car</button><button onclick="quick(\'Write a short story for me\')">✍️ Story</button></div>Or just type: "Generate blue car"'; busy=false; return; }
+  var chat = document.getElementById('chat'); if(chipsEl) chipsEl.style.display='none'; popup.style.display='none';
+  chat.innerHTML += '<div class="me">'+text+'</div>'; historyArr.push({role:'user',content:text}); input.value=''; busy=true;
+  var think = document.createElement('div'); think.className='ai'; think.textContent='Thinking...'; chat.appendChild(think); window.scrollTo(0,document.body.scrollHeight);
+  var imgCheck = isImageRequest(text);
+  if(imgCheck==='ask-topic'){ waitingForImageTopic=true; think.innerHTML='Yes! I fit generate image. Wetin you want? Type e.g. <b>Blue Car</b>, <b>House</b>'; busy=false; return; }
+  if(isPhotoEditRequest(text)){
+    waitingForImageTopic=false; think.textContent='Editing your REAL photo... only: '+text;
+    try{ var r = await fetch('/api/edit-image',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({image:lastUploadedImg, prompt:text})}); var d = await r.json(); if(d.image) think.innerHTML='Done. Only: <b>'+text+'</b><br><img src="'+d.image+'">'; else think.textContent='Edit fail: '+(d.error||'Unknown'); }catch(e){ think.textContent='No Internet - You need data'; } busy=false; return;
+  }
+  if(imgCheck==='make' || imgCheck==='make-from-topic'){
+    waitingForImageTopic=false; var prompt = cleanImagePrompt(text);
+    var imgUrl = 'https://image.pollinations.ai/prompt/' + encodeURIComponent(prompt + ', high quality, beautiful, detailed') + '?width=512&height=512&seed=' + Math.floor(Math.random()*99999) + '&nologo=true&model=flux';
+    think.innerHTML = 'Here is your image of <b>'+prompt+'</b><br><img src="'+imgUrl+'">';
+    historyArr.push({role:'assistant',content:'Generated image: '+prompt}); busy=false; return;
+  }
   waitingForImageTopic=false;
-  let langText = settings.lang==='pidgin' ? ' Answer in Nigerian Pidgin only.' : settings
+  var langText = settings.lang==='pidgin' ? ' Answer in Nigerian Pidgin only.' : settings.lang==='english' ? ' Answer in clear English only.' : ' Answer in English + Pidgin mix like PizChat.';
+  var styleText = settings.style==='short' ? ' Keep answer very short.' : settings.style==='detailed' ? ' Give detailed full explanation.' : ' Give normal clear answer.';
+  var extra = isCodeRequest(text) ? ' You are PizChat AI, built by PizChat. Give complete working code.' : ' You are PizChat AI, built by PizChat. Answer any question. Never say No answer. Never say you were built by OpenAI.';
+  var finalMsg = text + langText + styleText + extra;
+  try{
+    var res = await fetch('/api/chat',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({message:finalMsg,history:historyArr})});
+    var dd = await res.json(); var ans = dd.answer||'';
+    if(!ans || ans.trim()==='' || ans.trim().toLowerCase()==='no answer'){ ans='I be PizChat AI, built by PizChat. Ask me again, I go answer you well.'; }
+    ans = fixIdentity(ans); ans = ans.replace(/```/g,'<pre>'); think.innerHTML=ans; historyArr.push({role:'assistant',content:ans});
+  }catch(e){ think.textContent='No Internet - You need data'; }
+  busy=false;
+}
+document.addEventListener('click', function(e){
+  if(!e.target.closest('#sidePopup') && !e.target.closest('.icon') && !e.target.closest('#top')){
+    if(popup) popup.style.display='none';
+  }
+});
+</script>
+</body></html>
