@@ -5,11 +5,13 @@
 body{background:#000;color:#fff;font-family:sans-serif;margin:0;padding:10px}
 #top{display:flex;justify-content:space-between;align-items:center}
 #top button{background:#222;color:#fff;border:none;padding:8px 14px;border-radius:20px}
-#chat{display:flex;flex-direction:column;gap:10px;padding-bottom:150px}
+#chat{display:flex;flex-direction:column;gap:10px;padding-bottom:120px}
 .me{background:#a3e635;color:#000;align-self:flex-end;padding:10px 14px;border-radius:18px;max-width:85%}
 .ai{background:#222;padding:10px 14px;border-radius:18px;max-width:85%}
-#chips{display:flex;gap:8px;flex-wrap:wrap;position:fixed;bottom:72px;left:10px;right:10px}
+#chips{display:flex;gap:8px;flex-wrap:wrap;margin:10px 0}
 #chips button{background:#222;color:#fff;border:1px solid #444;padding:8px 12px;border-radius:20px;font-size:13px}
+#sidePopup{display:none;position:fixed;left:10px;bottom:72px;background:#111;border:1px solid #444;border-radius:16px;padding:10px;flex-direction:column;gap:8px;z-index:99;max-width:220px}
+#sidePopup button{background:#222;color:#fff;border:1px solid #444;padding:10px;border-radius:12px;text-align:left;font-size:14px}
 #bar{position:fixed;bottom:0;left:0;right:0;display:flex;gap:8px;padding:10px;background:#000;align-items:center}
 input{flex:1;padding:12px;border-radius:20px;border:none;background:#222;color:#fff}
 .icon{width:42px;height:42px;border-radius:50%;border:none;background:#222;color:#fff;font-size:18px}
@@ -17,16 +19,27 @@ input{flex:1;padding:12px;border-radius:20px;border:none;background:#222;color:#
 </style></head>
 <body>
 <div id="top"><h2 style="margin:0">PizChat AI</h2><button onclick="newChat()">+ New Chat</button></div>
-<div id="chat"><div class="ai">Good evening, Mia ✨ How can I help today?</div></div>
+<div id="chat">
 <div id="chips">
 <button onclick="quick('Write a short story for me')">✍️ Write a story</button>
 <button onclick="quick('Explain like I am 5')">🧒 Explain like I am 5</button>
 <button onclick="quick('Give me a business idea in Nigeria')">💡 Business idea</button>
 <button onclick="quick('Help me with my homework')">📚 Homework</button>
 </div>
+<div class="ai">Good evening, Mia ✨ How can I help today?</div>
+</div>
+
+<div id="sidePopup">
+<button onclick="quick('Write a short story for me')">✍️ Write a story</button>
+<button onclick="quick('Explain like I am 5')">🧒 Explain like I am 5</button>
+<button onclick="quick('Give me a business idea in Nigeria')">💡 Business idea</button>
+<button onclick="quick('Help me with my homework')">📚 Homework</button>
+<button onclick="quick('Give me a motivational quote')">✨ Motivation</button>
+<button onclick="togglePopup()">✖️ Close</button>
+</div>
+
 <div id="bar">
-<button class="icon" onclick="document.getElementById('file').click()">+</button>
-<input type="file" id="file" hidden onchange="alert('File picked: '+this.files[0].name+' - PizChat go soon fit read am')">
+<button class="icon" onclick="togglePopup()">+</button>
 <button class="icon" onclick="mic()">🎤</button>
 <input id="q" placeholder="Ask anything...">
 <button class="icon" id="send" onclick="send()">➤</button>
@@ -34,11 +47,34 @@ input{flex:1;padding:12px;border-radius:20px;border:none;background:#222;color:#
 <script>
 let history=[];
 let busy=false;
+let chipsEl=document.getElementById('chips');
+let popup=document.getElementById('sidePopup');
+let input=document.getElementById('q');
+
+// Show chips on first open of the day / fresh open
+let today=new Date().toDateString();
+let lastDay=localStorage.getItem('pizchat_day');
+if(lastDay!==today){ localStorage.setItem('pizchat_day', today); chipsEl.style.display='flex'; }
+else { chipsEl.style.display='flex'; }
+
+function togglePopup(){
+  if(popup.style.display==='flex'){ popup.style.display='none'; }
+  else { popup.style.display='flex'; }
+}
 function newChat(){
   history=[];
-  document.getElementById('chat').innerHTML='<div class="ai">Fresh chat ✨ Wetin you wan talk about?</div>';
+  document.getElementById('chat').innerHTML='<div id="chips">'+chipsEl.innerHTML+'</div><div class="ai">Fresh chat ✨ Wetin you wan talk about?</div>';
+  chipsEl=document.getElementById('chips');
+  chipsEl.style.display='flex';
+  popup.style.display='none';
 }
-function quick(t){ document.getElementById('q').value=t; send(); }
+function quick(t){ popup.style.display='none'; document.getElementById('q').value=t; send(); }
+
+// When person is typing, chips disappear
+input.addEventListener('input', ()=>{
+  if(input.value.trim().length>0){ if(chipsEl) chipsEl.style.display='none'; popup.style.display='none'; }
+  else { if(history.length===0 && chipsEl) chipsEl.style.display='flex'; }
+});
 function mic(){
   if(!('webkitSpeechRecognition' in window || 'SpeechRecognition' in window)){ alert('Mic no work for this browser, use Chrome'); return; }
   let Rec = window.SpeechRecognition || window.webkitSpeechRecognition;
@@ -47,10 +83,11 @@ function mic(){
 }
 async function send(){
   if(busy) return;
-  let input=document.getElementById('q');
   let text=input.value.trim();
   if(!text) return;
   let chat=document.getElementById('chat');
+  if(chipsEl) chipsEl.style.display='none';
+  popup.style.display='none';
   chat.innerHTML+='<div class="me">'+text+'</div>';
   history.push({role:'user',content:text});
   input.value='';
@@ -68,6 +105,7 @@ async function send(){
   }catch(e){ think.textContent='Network error, try again'; }
   busy=false;
 }
-document.getElementById('q').addEventListener('keydown',e=>{ if(e.key==='Enter') send(); });
+input.addEventListener('keydown',e=>{ if(e.key==='Enter') send(); });
+document.addEventListener('click',e=>{ if(!e.target.closest('#sidePopup') && !e.target.closest('.icon')){ popup.style.display='none'; } });
 </script>
 </body></html>
