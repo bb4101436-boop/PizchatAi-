@@ -14,7 +14,7 @@ export default async function handler(req, res) {
     const r = await fetch('https://api.groq.com/openai/v1/chat/completions', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + process.env.GROQ_API_KEY },
-      body: JSON.stringify({ model: 'openai/gpt-oss-20b', messages: [{ role: 'user', content: q }], max_tokens: 500 })
+      messages: [{ role: 'system', content: 'Answer in plain simple text. No markdown, no **, no tables, no LaTeX. Use short clear sentences.' }, { role: 'user', content: q }]
     });
     const data = await r.json();
     if (!r.ok) return res.status(200).json({ answer: 'Groq error: ' + (data.error && data.error.message ? data.error.message : 'check key') });
