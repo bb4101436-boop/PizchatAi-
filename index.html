@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 <html><head><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>PizChat AI</title>
+<title>PizChat AI - Built by PizChat</title>
 <style>
 body{background:#000;color:#fff;font-family:sans-serif;margin:0;padding:10px}
 body.light{background:#f5f5f5;color:#000}
@@ -13,6 +13,8 @@ body.light input, body.light .icon, body.light #top button, body.light #chips bu
 #chat{display:flex;flex-direction:column;gap:10px;padding-bottom:120px}
 .me{background:#a3e635;color:#000;align-self:flex-end;padding:10px 14px;border-radius:18px;max-width:85%}
 .ai{background:#222;padding:10px 14px;border-radius:18px;max-width:85%}
+.ai img{width:100%;border-radius:12px;margin-top:8px}
+.ai pre{background:#000;color:#a3e635;padding:10px;border-radius:10px;overflow-x:auto;white-space:pre-wrap}
 #chips{display:flex;gap:8px;flex-wrap:wrap;margin:10px 0}
 #chips button{background:#222;color:#fff;border:1px solid #444;padding:8px 12px;border-radius:20px;font-size:13px}
 #sidePopup{display:none;position:fixed;left:10px;bottom:72px;background:#111;border:1px solid #444;border-radius:16px;padding:10px;flex-direction:column;gap:8px;z-index:99;max-width:220px}
@@ -40,7 +42,7 @@ input{flex:1;padding:12px;border-radius:20px;border:none;background:#222;color:#
 <button onclick="quick('Give me a business idea in Nigeria')">💡 Business idea</button>
 <button onclick="quick('Help me with my homework')">📚 Homework</button>
 </div>
-<div class="ai">Good evening, Mia ✨ How can I help today?</div>
+<div class="ai">Hello ✨ How can I help today? Ask question, ask for code, or ask me to generate image.</div>
 </div>
 
 <div id="sidePopup">
@@ -48,26 +50,27 @@ input{flex:1;padding:12px;border-radius:20px;border:none;background:#222;color:#
 <button onclick="quick('Explain like I am 5')">🧒 Explain like I am 5</button>
 <button onclick="quick('Give me a business idea in Nigeria')">💡 Business idea</button>
 <button onclick="quick('Help me with my homework')">📚 Homework</button>
-<button onclick="quick('Give me a motivational quote')">✨ Motivation</button>
+<button onclick="quick('Generate image of a beautiful Lagos city at sunset')">🎨 Generate Image</button>
+<button onclick="quick('Write HTML code for a login page')">💻 Write Code</button>
 <button onclick="togglePopup()">✖️ Close</button>
 </div>
 
 <div id="overlay" onclick="closeSettings()"></div>
 <div id="settingsPanel">
 <h3>✏️ Settings</h3>
-<p style="font-size:13px;color:#aaa">PizChat AI • Mia</p>
+<p style="font-size:13px;color:#aaa">PizChat AI • Built by PizChat</p>
 <div class="setRow"><label>Language</label><select id="setLang" onchange="saveSettings()"><option value="mix">English + Pidgin Mix</option><option value="english">English Only</option><option value="pidgin">Pidgin Only</option></select></div>
 <div class="setRow"><label>Answer Style</label><select id="setStyle" onchange="saveSettings()"><option value="normal">Normal</option><option value="short">Short & Sharp</option><option value="detailed">Detailed</option></select></div>
 <div class="setRow"><label>Theme</label><select id="setTheme" onchange="saveSettings()"><option value="dark">Dark</option><option value="light">Light</option></select></div>
 <div class="setRow"><label>Font Size</label><select id="setFont" onchange="saveSettings()"><option value="15">Normal</option><option value="17">Big</option><option value="13">Small</option></select></div>
 <div class="setRow"><button onclick="clearChat()">🗑️ Clear Chat</button><button onclick="newChat();closeSettings()">✨ Start New Chat</button><button onclick="closeSettings()" style="background:#222;color:#fff">Close Settings</button></div>
-<p style="font-size:12px;color:#888;text-align:center">Version 1.0 • Made for Mia</p>
+<p style="font-size:12px;color:#888;text-align:center">PizChat AI • Version 1.0 • Built by PizChat</p>
 </div>
 
 <div id="bar">
 <button class="icon" onclick="togglePopup()">+</button>
 <button class="icon" onclick="mic()">🎤</button>
-<input id="q" placeholder="Ask anything...">
+<input id="q" placeholder="Ask anything, code or image...">
 <button class="icon" id="send" onclick="send()">➤</button>
 </div>
 <script>
@@ -82,27 +85,29 @@ document.getElementById('setStyle').value=settings.style;
 document.getElementById('setTheme').value=settings.theme;
 document.getElementById('setFont').value=settings.font;
 applySettings();
-function applySettings(){
-  document.body.classList.toggle('light', settings.theme==='light');
-  document.body.style.fontSize=settings.font+'px';
-}
-function saveSettings(){
-  settings={lang:document.getElementById('setLang').value, style:document.getElementById('setStyle').value, theme:document.getElementById('setTheme').value, font:document.getElementById('setFont').value};
-  localStorage.setItem('pizchat_settings', JSON.stringify(settings));
-  applySettings();
-}
+function applySettings(){ document.body.classList.toggle('light', settings.theme==='light'); document.body.style.fontSize=settings.font+'px'; }
+function saveSettings(){ settings={lang:document.getElementById('setLang').value, style:document.getElementById('setStyle').value, theme:document.getElementById('setTheme').value, font:document.getElementById('setFont').value}; localStorage.setItem('pizchat_settings', JSON.stringify(settings)); applySettings(); }
 function openSettings(){ document.getElementById('settingsPanel').style.display='block'; document.getElementById('overlay').style.display='block'; }
 function closeSettings(){ document.getElementById('settingsPanel').style.display='none'; document.getElementById('overlay').style.display='none'; }
 function clearChat(){ history=[]; document.getElementById('chat').innerHTML='<div class="ai">Chat cleared ✨ Wetin you wan talk about?</div>'; closeSettings(); }
 let today=new Date().toDateString();
 let lastDay=localStorage.getItem('pizchat_day');
-if(lastDay!==today){ localStorage.setItem('pizchat_day', today); chipsEl.style.display='flex'; }
-else { chipsEl.style.display='flex'; }
+if(lastDay!==today){ localStorage.setItem('pizchat_day', today); chipsEl.style.display='flex'; } else { chipsEl.style.display='flex'; }
 function togglePopup(){ if(popup.style.display==='flex'){ popup.style.display='none'; } else { popup.style.display='flex'; } }
 function newChat(){ history=[]; document.getElementById('chat').innerHTML='<div id="chips">'+chipsEl.innerHTML+'</div><div class="ai">Fresh chat ✨ Wetin you wan talk about?</div>'; chipsEl=document.getElementById('chips'); chipsEl.style.display='flex'; popup.style.display='none'; closeSettings(); }
 function quick(t){ popup.style.display='none'; document.getElementById('q').value=t; send(); }
 input.addEventListener('input', ()=>{ if(input.value.trim().length>0){ if(chipsEl) chipsEl.style.display='none'; popup.style.display='none'; } else { if(history.length===0 && chipsEl) chipsEl.style.display='flex'; } });
 function mic(){ if(!('webkitSpeechRecognition' in window || 'SpeechRecognition' in window)){ alert('Mic no work for this browser, use Chrome'); return; } let Rec = window.SpeechRecognition || window.webkitSpeechRecognition; let r = new Rec(); r.lang='en-NG'; r.start(); r.onresult = e=>{ document.getElementById('q').value = e.results[0][0].transcript; send(); }; }
+
+function isImageRequest(t){
+  t=t.toLowerCase();
+  return t.includes('generate image')||t.includes('create image')||t.includes('draw')||t.includes('picture of')||t.includes('generate picture')||t.includes('make an image');
+}
+function isCodeRequest(t){
+  t=t.toLowerCase();
+  return t.includes('code')||t.includes('html')||t.includes('python')||t.includes('javascript')||t.includes('website')||t.includes('app code')||t.includes('write a program');
+}
+
 async function send(){
   if(busy) return;
   let text=input.value.trim();
@@ -111,9 +116,6 @@ async function send(){
   if(chipsEl) chipsEl.style.display='none';
   popup.style.display='none';
   chat.innerHTML+='<div class="me">'+text+'</div>';
-  let langText = settings.lang==='pidgin' ? ' Answer in Nigerian Pidgin only.' : settings.lang==='english' ? ' Answer in clear English only.' : ' Answer in English + Pidgin mix like PizChat.';
-  let styleText = settings.style==='short' ? ' Keep answer very short.' : settings.style==='detailed' ? ' Give detailed full explanation.' : ' Give normal clear answer.';
-  let finalMsg = text + langText + styleText;
   history.push({role:'user',content:text});
   input.value='';
   busy=true;
@@ -121,11 +123,30 @@ async function send(){
   think.className='ai'; think.textContent='Thinking...';
   chat.appendChild(think);
   window.scrollTo(0,document.body.scrollHeight);
+
+  // IMAGE GENERATION - FAST, DIRECT
+  if(isImageRequest(text)){
+    let prompt = text.replace(/generate image of|generate image|create image of|create image|draw|picture of|make an image of/gi,'').trim() || text;
+    let imgUrl = 'https://image.pollinations.ai/prompt/' + encodeURIComponent(prompt) + '?width=512&height=512&seed=' + Math.floor(Math.random()*9999) + '&nologo=true';
+    think.innerHTML = 'Here is your image ✨<br><img src="'+imgUrl+'" onload="window.scrollTo(0,document.body.scrollHeight)"><br><small>'+prompt+'</small>';
+    history.push({role:'assistant',content:'Generated image: '+prompt});
+    busy=false; return;
+  }
+
+  let langText = settings.lang==='pidgin' ? ' Answer in Nigerian Pidgin only.' : settings.lang==='english' ? ' Answer in clear English only.' : ' Answer in English + Pidgin mix like PizChat.';
+  let styleText = settings.style==='short' ? ' Keep answer very short.' : settings.style==='detailed' ? ' Give detailed full explanation.' : ' Give normal clear answer.';
+  let extra = '';
+  if(isCodeRequest(text)){ extra = ' You are an expert coder. Give complete working code, with explanation. Put code in code block. Do not cut code.'; }
+  else { extra = ' You can answer any question, write anything, help with anything.'; }
+  let finalMsg = text + langText + styleText + extra;
+
   try{
     let res=await fetch('/api/chat',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({message:finalMsg,history:history})});
     let d=await res.json();
     let ans=d.answer||'No answer';
-    think.textContent=ans;
+    // Make code look nice
+    ans = ans.replace(/```/g,'<pre>').replace(/```/g,'</pre>');
+    think.innerHTML=ans;
     history.push({role:'assistant',content:ans});
   }catch(e){ think.textContent='Network error, try again'; }
   busy=false;
